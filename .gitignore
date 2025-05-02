@@ -1,0 +1,13 @@
+echo "target/
+.classpath
+.project
+.settings/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.idea/
+*.log
+" > .gitignore
