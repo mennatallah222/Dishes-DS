@@ -33,6 +33,58 @@ then run:
 ```bash
 standalone.bat
 ```
+<details>
+  <summary>
+  STEPS TO CONFIGURE THE DB FOR JAVAEE:
+  </summary>
+  Download JDBC driver (postgresql-42.7.5.jar)
+  place it inside: C:\Users\wildfly-36.0.0.Final\wildfly-36.0.0.Final\modules\system\layers\base\org\postgresql\main
+  inside that folder:
+  module.xml and the jar file
+  
+  content of: module.xml:
+  <module xmlns="urn:jboss:module:1.3" name="org.postgresql">
+      <resources>
+          <resource-root path="postgresql-42.7.5.jar"/>
+      </resources>
+      <dependencies>
+          <module name="javax.api"/>
+          <module name="javax.transaction.api"/>
+      </dependencies>
+  </module>
+  
+  
+  Configure Datasource
+  
+  1- Start WildFly:
+  
+  $WILDFLY_HOME/bin/standalone.sh
+  
+  2- In another terminal, connect CLI:
+  
+  go to WILDFLY folder in your device:
+  
+  cd "$WILDFLY_HOME"/bin/jboss-cli.sh --connect
+  
+  Execute:
+  
+  data-source add \
+  --name=PostgresDS \
+  --jndi-name=java:/PostgresDS \
+  --driver-name=postgresql \
+  --connection-url=jdbc:postgresql://localhost:5432/admin_dishes \
+  --user-name=postgres \
+  --password=postgres \
+  --validate-on-match=true \
+  --background-validation=false \
+  --min-pool-size=5 \
+  --max-pool-size=20
+
+</details>
+
+![image](https://github.com/user-attachments/assets/1910075e-8160-4c3e-a34c-6bce43abba83)
+![image](https://github.com/user-attachments/assets/33f76711-e964-4672-bd75-b84ff6428a42)
+
 
 ---
 
