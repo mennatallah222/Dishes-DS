@@ -8,14 +8,19 @@
   <artifactId>dishes-proj</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <packaging>pom</packaging>
+  <modules>
+    <module>admin-services</module>
+    <module>cutsomerorderpaymentservices</module>
+
+  </modules>
   <name>dishes-proj</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>http://www.dishes-proj.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>23</maven.compiler.source>
+    <maven.compiler.target>23</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -28,7 +33,7 @@
   </dependencies>
 
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+    <pluginManagement>
       <plugins>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
         <plugin>

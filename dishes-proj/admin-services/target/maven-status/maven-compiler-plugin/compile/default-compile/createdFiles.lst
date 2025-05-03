@@ -1,0 +1,9 @@
+com\dishes\rest\AdminResource.class
+com\dishes\entities\User.class
+com\dishes\entities\CompanyRep.class
+com\dishes\ejb\AdminServiceBean.class
+com\dishes\ejb\UserServiceBean.class
+com\dishes\rest\RestApplication.class
+com\dishes\dtos\UserDTO.class
+com\dishes\entities\Admin.class
+com\dishes\startup\AdminInitializer.class
