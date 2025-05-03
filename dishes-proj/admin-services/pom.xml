@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>admin-service</artifactId>
+    <artifactId>admin-services</artifactId>
     <packaging>war</packaging>
 
     <name>User Service</name>
@@ -18,9 +18,15 @@
 
     <properties>
         <wildfly.version>26.1.3.Final</wildfly.version>
+        <wildfly.plugin.version>4.0.0.Final</wildfly.plugin.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
@@ -39,6 +45,13 @@
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.1.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.4.3.Final</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -52,7 +65,15 @@
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>3.0.1.Final</version>
+                <version>${wildfly.plugin.version}</version>
+                <configuration>
+                    <hostname>localhost</hostname>
+                    <port>9990</port>
+                    <username>postgres</username>
+                    <password>postgres</password>
+                    <debug>true</debug>
+                    <verbose>true</verbose>
+                </configuration>
             </plugin>
         </plugins>
     </build>

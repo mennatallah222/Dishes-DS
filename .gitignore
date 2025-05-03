@@ -1,4 +1,4 @@
-echo "target/
+target/
 .classpath
 .project
 .settings/
@@ -10,4 +10,3 @@ bin/
 *.iml
 .idea/
 *.log
-" > .gitignore
