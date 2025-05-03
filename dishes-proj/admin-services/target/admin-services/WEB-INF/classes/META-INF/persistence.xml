@@ -1,0 +1,10 @@
+<persistence version="3.0">
+    <persistence-unit name="userPU">
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <class>com.dishes.user.entity.Admin</class>
+        <class>com.dishes.user.entity.CompanyRep</class>
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+</persistence>

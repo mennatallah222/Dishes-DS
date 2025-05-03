@@ -1,0 +1,9 @@
+com\dishes\dto\LoginDTO.class
+com\dishes\repositories\CustomerRepository.class
+com\dishes\controllers\CustomerController.class
+com\dishes\controllers\Response.class
+com\dishes\entities\Customer.class
+com\dishes\Main.class
+com\dishes\services\CustomerService.class
+com\dishes\controllers\AuthController.class
+com\dishes\services\AuthService.class
