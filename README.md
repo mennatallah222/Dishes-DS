@@ -25,14 +25,14 @@
   📁 Recommended location: any folder **except** `C:\Program Files`
 - Create the 1st db and name it: **customer-order-payment-db**
 - ✅ **Start WildFly Server**
-  Navigate to:
+  Opne CMD as an Adminstrator, then navigate to:
+```bash
+cd C:\Users\wildfly-36.0.0.Final\wildfly-36.0.0.Final\bin
 ```
-
-C:\Users\wildfly-36.0.0.Final\wildfly-36.0.0.Final\bin
-
-````
-Double-click `standalone.bat` to launch the server.
-
+then run:
+```bash
+standalone.bat
+```
 ---
 
 ## Clone the project
