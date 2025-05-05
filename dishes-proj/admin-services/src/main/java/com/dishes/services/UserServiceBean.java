@@ -1,4 +1,4 @@
-package com.dishes.ejb;
+package com.dishes.services;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
