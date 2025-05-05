@@ -88,6 +88,20 @@ standalone.bat
 
 ---
 
+```bash
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:management
+```
+
+### Access RabbitMQ Web UI:
+
+Visit http://localhost:15672
+
+Username: guest
+
+Password: guest
+
+---
+
 ## Clone the project
 
 ```bash
@@ -163,4 +177,44 @@ mvn spring-boot:run
     "password": "123"
   }
   ```
+</details>
+
+<details>
+<summary>🔹 Create Company Representative Account</summary>
+
+- **Method:** `POST`  
+- **Endpoint:** `http://localhost:8080/admin-services/api/admin/add-companies`  
+- **Request Body:**
+  ```json
+  [
+    {
+        "email": "SOME 'REAL' EMAIL",
+        "companyName": "NewCompany Inc1"
+    },
+    {
+        "email": "SOME 'REAL' EMAIL",
+        "companyName": "NewCompany Inc2"
+    },
+    {
+        "email": "SOME 'REAL' EMAIL",
+        "companyName": "NewCompany Inc2" //that request returns an error message that it's duplicate
+    }
+  ]
+  ```
+  - Response:
+    ```json
+    [
+        "NewCompany Inc1 (SOME 'REAL' EMAIL): PASSWORD-PLACEHOLDER",
+        "NewCompany Inc2 (SOME 'REAL' EMAIL): PASSWORD-PLACEHOLDER",
+        "Already existing companies: NewCompany Inc2 already exists"
+    ]
+    ```
+</details>
+
+<details>
+<summary>🔹 Get Companies representitives</summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8080/admin-services/api/admin/get-companies`
+- **Request Body:** None
 </details>
