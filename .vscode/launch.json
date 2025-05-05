@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "RabbitMQConsumer",
+      "request": "launch",
+      "mainClass": "com.dishes.rabbitmq.RabbitMQConsumer",
+      "projectName": "admin-service"
+    },
+    {
+      "type": "java",
       "name": "Run Current File",
       "request": "launch",
       "mainClass": "com.dishes.App",

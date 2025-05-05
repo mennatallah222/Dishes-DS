@@ -10,3 +10,4 @@ bin/
 *.iml
 .idea/
 *.log
+email.properties
