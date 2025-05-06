@@ -163,6 +163,14 @@ mvn spring-boot:run
   ```
 </details>
 
+<details>
+<summary>🔹 Get Customers: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8081/api/customers/getCustomers`
+- **Request Body:** None
+</details>
+
 #### For `Admin Services`:
 
 <details>
@@ -216,5 +224,13 @@ mvn spring-boot:run
 
 - **Method:** `GET`
 - **Endpoint:** `http://localhost:8080/admin-services/api/admin/get-companies`
+- **Request Body:** None
+</details>
+
+<details>
+<summary>🔹 Get Customers: <strong>request from <code>Customer-Order-Payment Services</code></strong></summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8080/admin-services/api/admin/customers`
 - **Request Body:** None
 </details>
