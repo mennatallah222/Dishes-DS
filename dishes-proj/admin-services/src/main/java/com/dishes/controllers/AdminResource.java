@@ -13,6 +13,7 @@ import com.dishes.dtos.CompanyCreationResult;
 import com.dishes.dtos.CompanyDTO;
 import com.dishes.entities.Admin;
 import com.dishes.services.AdminServiceBean;
+import com.dishes.services.CustomerServiceBean;
 
 @Path("/admin")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -21,6 +22,8 @@ public class AdminResource {
 
     @Inject
     private AdminServiceBean adminService;
+    @Inject
+    private CustomerServiceBean customerService;
 
     @POST
     @Path("/login")
@@ -48,13 +51,17 @@ public class AdminResource {
         return Response.ok(output).build();
     }
 
-    //This method is a placholder for now to get the customers' all-data from the 3rd service in the project
-    // @GET
-    // @Path("/customers")
-    // @RolesAllowed("ADMIN")
-    // public Response listCustomers() {
-
-    // }
+    @GET
+    @Path("/customers")
+    @RolesAllowed("ADMIN")
+    public Response listCustomers() {
+        try{
+            return Response.ok(customerService.getAllCustomers()).build();
+        }
+        catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error fetching the customers: "+e.getMessage()).build();
+        }
+    }
 
     @GET
     @Path("/get-companies")

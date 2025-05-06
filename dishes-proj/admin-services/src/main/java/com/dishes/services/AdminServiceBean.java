@@ -24,6 +24,7 @@ public class AdminServiceBean {
     private EntityManager em;
     @Inject
     private RabbitMQProducer rabbitMQProducer;
+    
 
     public Admin authenticate(String email, String password) {
         try {
@@ -79,11 +80,6 @@ public class AdminServiceBean {
         return new CompanyCreationResult(createdReps, skippedMsgs);
     }
 
-
-    //This method is a placholder for now to get the customers' all-data from the 3rd service in the project
-    public List<UserDTO> listCustomers() {
-        return null;
-    }
 
     public List<UserDTO> listCompanyReps() {
         return em.createQuery("SELECT new com.dishes.dtos.UserDTO(u.name, u.email) FROM CompanyRep u", UserDTO.class)
