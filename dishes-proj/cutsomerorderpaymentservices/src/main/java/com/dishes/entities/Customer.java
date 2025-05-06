@@ -8,16 +8,10 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     @Column(unique = true)
     private String email;
-
     private String password;
-
-    // @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    // private List<Order> orders;
 
     public Long getId() {
         return id;
@@ -46,12 +40,4 @@ public class Customer {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    // public List<Order> getOrders() {
-    //     return orders;
-    // }
-  
-    // public void setOrders(List<Order> orders) {
-    //     this.orders = orders;
-    // }
 }

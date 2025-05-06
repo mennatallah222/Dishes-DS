@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,12 +17,16 @@ public class CustomerService {
 
     public Optional<String> validate(Customer c) {
         if (c == null) return Optional.of("Customer object must not be null");
-        if (!StringUtils.hasText(c.getEmail())) return Optional.of("Email must not be null or empty");
+        if (!StringUtils.hasText(c.getEmail())) return Optional.of("Email must not be or empty");
         if (customerRepository.findByEmail(c.getEmail()).isPresent()) return Optional.of("Email already registered");
         return Optional.empty();
     }
 
     public Customer register(Customer c) {
         return customerRepository.save(c);
+    }
+
+    public List<Customer> getAllCustomers(){
+        return customerRepository.findAll();
     }
 }

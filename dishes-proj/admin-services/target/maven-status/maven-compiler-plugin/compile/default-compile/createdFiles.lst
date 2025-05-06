@@ -7,9 +7,11 @@ com\dishes\entities\Admin.class
 com\dishes\entities\User.class
 com\dishes\entities\CompanyRep.class
 com\dishes\controllers\RestApplication.class
+com\dishes\clients\CustomerServiceClient.class
 com\dishes\rabbitmq\RabbitMQConsumer.class
 com\dishes\dtos\CompanyCreationResult.class
 com\dishes\rabbitmq\RabbitMQProducer.class
+com\dishes\clients\CustomerServiceClient$1.class
 com\dishes\dtos\CredentialsMessage.class
-com\dishes\services\UserServiceBean.class
+com\dishes\services\CustomerServiceBean.class
 com\dishes\startup\AdminInitializer.class
