@@ -1,5 +1,7 @@
 com\dishes\controllers\AdminResource.class
 com\dishes\services\AdminServiceBean.class
+com\dishes\dtos\SellerLoginRequest.class
+com\dishes\dtos\SellerResponse.class
 com\dishes\rabbitmq\RabbitMQConsumer$GmailAuthenticator.class
 com\dishes\dtos\CompanyDTO.class
 com\dishes\dtos\UserDTO.class
@@ -14,4 +16,5 @@ com\dishes\rabbitmq\RabbitMQProducer.class
 com\dishes\clients\CustomerServiceClient$1.class
 com\dishes\dtos\CredentialsMessage.class
 com\dishes\services\CustomerServiceBean.class
+com\dishes\jwt\JwtUtil.class
 com\dishes\startup\AdminInitializer.class

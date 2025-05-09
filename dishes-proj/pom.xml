@@ -12,6 +12,7 @@
   <modules>
     <module>admin-services</module>
     <module>cutsomerorderpaymentservices</module>
+    <module>seller-inventory-services</module>
 
   </modules>
   <name>dishes-proj</name>
