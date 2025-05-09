@@ -5,8 +5,11 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\controllers\AdminResource.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\dtos\CompanyDTO.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\dtos\CredentialsMessage.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\dtos\SellerLoginRequest.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\jwt\JwtUtil.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\rabbitmq\RabbitMQConsumer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\services\CustomerServiceBean.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\dtos\SellerResponse.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\entities\Admin.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\dtos\CompanyCreationResult.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\dishes-proj\admin-services\src\main\java\com\dishes\rabbitmq\RabbitMQProducer.java

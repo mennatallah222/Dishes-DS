@@ -2,6 +2,8 @@ package com.dishes.controllers;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -11,6 +13,8 @@ import java.util.List;
 
 import com.dishes.dtos.CompanyCreationResult;
 import com.dishes.dtos.CompanyDTO;
+import com.dishes.dtos.SellerLoginRequest;
+import com.dishes.dtos.SellerResponse;
 import com.dishes.entities.Admin;
 import com.dishes.services.AdminServiceBean;
 import com.dishes.services.CustomerServiceBean;
@@ -70,4 +74,15 @@ public class AdminResource {
         return Response.ok(adminService.listCompanyReps()).build();
     }
 
+    @POST
+    @Path("/seller/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loginSeller(@Valid @NotNull SellerLoginRequest req){
+        SellerResponse seller=adminService.authenticateSeller(req.getEmail(), req.getCompanyName(), req.getPassword());
+        if(seller==null){
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        return Response.ok(seller).build();
+    }
 }

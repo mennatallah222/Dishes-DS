@@ -7,8 +7,10 @@ import java.util.UUID;
 import com.dishes.dtos.CompanyCreationResult;
 import com.dishes.dtos.CompanyDTO;
 import com.dishes.dtos.CredentialsMessage;
+import com.dishes.dtos.SellerResponse;
 import com.dishes.dtos.UserDTO;
 import com.dishes.entities.*;
+import com.dishes.jwt.JwtUtil;
 import com.dishes.rabbitmq.RabbitMQProducer;
 
 import jakarta.ejb.Stateless;
@@ -25,6 +27,8 @@ public class AdminServiceBean {
     @Inject
     private RabbitMQProducer rabbitMQProducer;
     
+    @Inject
+    private JwtUtil jwtUtil;
 
     public Admin authenticate(String email, String password) {
         try {
@@ -84,5 +88,30 @@ public class AdminServiceBean {
     public List<UserDTO> listCompanyReps() {
         return em.createQuery("SELECT new com.dishes.dtos.UserDTO(u.name, u.email) FROM CompanyRep u", UserDTO.class)
                 .getResultList();
+    }
+
+    public SellerResponse authenticateSeller(String email, String companyName, String password){
+        try {
+            CompanyRep seller = em.createQuery(
+                    "SELECT c FROM CompanyRep c WHERE c.email = :email AND c.companyName = :companyName", CompanyRep.class)
+                .setParameter("email", email)
+                .setParameter("companyName", companyName)
+                .getSingleResult();
+            if (seller != null && seller.getPassword().equals(password)) {
+                String token = jwtUtil.generateToken(seller.getEmail());
+                
+                SellerResponse response = new SellerResponse();
+                response.setToken(token);
+                response.setEmail(seller.getEmail());
+                response.setSellerID(seller.getId().toString());
+                response.setCompanyName(seller.getCompanyName());
+                
+                return response;
+            }
+        }
+        catch (NoResultException e) {
+            return null;
+        }
+        return null;
     }
 }

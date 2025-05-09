@@ -1,0 +1,17 @@
+server:
+  port: 8082
+
+admin:
+  service:
+    url : http://localhost:8080
+
+spring:
+  security:
+    user:
+      name: admin
+      password: admin
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
