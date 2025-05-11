@@ -98,7 +98,7 @@ public class AdminServiceBean {
                 .setParameter("companyName", companyName)
                 .getSingleResult();
             if (seller != null && seller.getPassword().equals(password)) {
-                String token = jwtUtil.generateToken(seller.getEmail());
+                String token = jwtUtil.generateToken(seller.getId(), seller.getCompanyName(), seller.getEmail());
                 
                 SellerResponse response = new SellerResponse();
                 response.setToken(token);
