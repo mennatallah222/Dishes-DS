@@ -1,9 +1,13 @@
 package com.dishes.dtos;
 
-public class SellerLoginResponse {
+import com.dishes.interfaces.SellerLoginResponse;
+
+public class SellerLoginSuccessResponse implements SellerLoginResponse{
     private String token;
     private String sellerID;
     private String companyName;
+    
+
     public String getToken() {
         return token;
     }
@@ -22,4 +26,5 @@ public class SellerLoginResponse {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+    
 }
