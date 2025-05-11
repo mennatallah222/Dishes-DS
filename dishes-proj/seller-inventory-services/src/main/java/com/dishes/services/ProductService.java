@@ -10,10 +10,8 @@ import com.dishes.entities.Product;
 import com.dishes.entities.Product.ProductStatus;
 import com.dishes.jwt.JwtTokenUtil;
 import com.dishes.entities.Seller;
-import com.dishes.entities.ShippingCompany;
 import com.dishes.repositories.ProductRepository;
 import com.dishes.repositories.SellerRespository;
-import com.dishes.repositories.ShippingCompanyRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -22,11 +20,9 @@ import jakarta.transaction.Transactional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final SellerRespository sellerRespository;
-    private final ShippingCompanyRepository shippingCompanyRepository;
     private final JwtTokenUtil token;
 
-    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token, ShippingCompanyRepository shippingCompanyRepository) {
-        this.shippingCompanyRepository=shippingCompanyRepository;
+    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token/*, ShippingCompanyRepository shippingCompanyRepository*/) {
         this.productRepository = productRepository;
         this.sellerRespository=sellerRespository;
         this.token=token;
@@ -48,19 +44,11 @@ public class ProductService {
         }
         seller.setId(sellerId);
 
-        ShippingCompany shippingCompany = shippingCompanyRepository.findByUniqueName(dish.getShippingCompanyName().trim().toLowerCase())
-                .orElseGet(() ->{
-                    ShippingCompany newCompany=new ShippingCompany();
-                    newCompany.setName(dish.getShippingCompanyName().trim());
-                    return shippingCompanyRepository.save(newCompany);
-                });
-
         Product newDish = new Product();
         newDish.setName(dish.getName());
         newDish.setAmount(dish.getAmount());
         newDish.setPrice(dish.getPrice());
         newDish.setStatus(dish.getAmount() > 0 ? ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
-        newDish.setShippingCompany(shippingCompany);
         newDish.setSeller(seller);
 
         Product savedDProduct=productRepository.save(newDish);
@@ -81,7 +69,6 @@ public class ProductService {
         response.setAmount(product.getAmount());
         response.setPrice(product.getPrice());
         response.setStatus(product.getStatus().name());
-        response.setShippingCompany(product.getShippingCompany().getName());
         return response;
     }
 }

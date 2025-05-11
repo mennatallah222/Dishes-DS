@@ -6,7 +6,6 @@ public class ProductResponse {
     private int amount;
     private double price;
     private String status;
-    private String shippingCompany;
     public Long getId() {
         return id;
     }
@@ -36,11 +35,5 @@ public class ProductResponse {
     }
     public void setStatus(String status) {
         this.status = status;
-    }
-    public String getShippingCompany() {
-        return shippingCompany;
-    }
-    public void setShippingCompany(String shippingCompany) {
-        this.shippingCompany = shippingCompany;
     }
 }

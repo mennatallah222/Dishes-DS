@@ -13,31 +13,45 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "products", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"name", "seller_id"})
+@Table(name = "orders", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"name", ""})
 })
-public class Product {
+public class Order {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private int amount;
-    private double price;
+    private double total;
     @Enumerated(EnumType.STRING)
-    private ProductStatus status;
+    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="seller_id", nullable = false)
-    private Seller seller;
+    @JoinColumn(name="shipping_company_id")
+    private ShippingCompany shippingCompany;
 
-    public Seller getSeller() {
-        return seller;
+    public ShippingCompany getShippingCompany() {
+        return shippingCompany;
     }
-    public void setSeller(Seller seller) {
-        this.seller = seller;
+    public void setShippingCompany(ShippingCompany shippingCompany) {
+        this.shippingCompany = shippingCompany;
     }
 
-    
+    public enum OrderStatus {
+        Pending("available"),
+        Cancelled("cancelled"),
+        Confirmed("confirmed");
+
+        private final String value;
+        OrderStatus(String value) {
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -56,29 +70,17 @@ public class Product {
     public void setAmount(int amount) {
         this.amount = amount;
     }
-    public double getPrice() {
-        return price;
+    public double getTotal() {
+        return total;
     }
-    public void setPrice(double price) {
-        this.price = price;
+    public void setPrice(double total) {
+        this.total = total;
     }
-    public ProductStatus getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
-    public void setStatus(ProductStatus status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
-    
-    public enum ProductStatus {
-        AVAILABLE("available"),
-        SOLD_OUT("soldout");
-
-        private final String value;
-        ProductStatus(String value) {
-            this.value = value;
-        }
-        public String getValue() {
-            return value;
-        }
-    }
 }
+
