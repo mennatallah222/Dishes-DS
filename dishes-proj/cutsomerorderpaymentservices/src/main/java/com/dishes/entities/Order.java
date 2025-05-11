@@ -14,7 +14,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "orders", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"name", ""})
+    @UniqueConstraint(columnNames = {"name"})
 })
 public class Order {
     
