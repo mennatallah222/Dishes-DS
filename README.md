@@ -12,6 +12,7 @@
 - [Prerequisites](#prerequisites)
 - [Clone the Project](#clone-the-project)
   - [Run the Admin Service](#run-the-admin-service)
+  - [Run the Seller-Inventory Services](#run-the-seller-inventory-services)
   - [Run the Customer-Order-Payment Services](#run-the-customer-order-payment-services)
 - [Available APIs](#available-apis)
 
@@ -19,17 +20,21 @@
 
 ## Prerequisites
 
-- ✅ **Install Java JDK 23**  
+- ✅ **Install Java JDK 23**
+
   ⚠️ *Required for project dependencies.*
 - ✅ **Install WildFly (v36.0.0.Final)**
+  
+  📁 Recommended location: any folder **except** `C:\Program Files`
+  --> inside 
 - ✅ **Install PostgreSQL**
   - 🚨 *Ensure your username and password are both: **postgres*** 🚨
 
-  📁 Recommended location: any folder **except** `C:\Program Files`
 - Create the 1st db and name it: **admin-dishes**
-- Create the 2st db and name it: **customer-order-payment-db**
+- Create the 2st db and name it: **seller-inventory-db**
+- Create the 3st db and name it: **customer-order-payment-db**
 - ✅ **Start WildFly Server**
-  Open CMD as an Administrator, then navigate to:
+  Open CMD as an **Administrator**, then navigate to:
 ```bash
 cd C:\Users\wildfly-36.0.0.Final\wildfly-36.0.0.Final\bin
 ```
@@ -89,6 +94,52 @@ standalone.bat
 ![image](https://github.com/user-attachments/assets/1910075e-8160-4c3e-a34c-6bce43abba83)
 ![image](https://github.com/user-attachments/assets/33f76711-e964-4672-bd75-b84ff6428a42)
 
+---
+
+<details>
+  <summary>
+    📌 <em>To allow CORS in the Java EE service</em> <code>admin-service</code> :
+  </summary>
+
+
+  Go to your WildFly installation folder<br>
+  This is the folder where you unzipped or installed WildFly. It might be named something like:<br>
+  wildfly-26.1.3.Final<br><br>
+
+  Navigate to the following path:<br>
+  wildfly-26.1.3.Final/<br>
+  └── standalone/<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;└── configuration/<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── standalone.xml<br><br>
+
+  Open standalone.xml with a text editor<br>
+  You can use VS Code, Notepad++, or even a regular text editor.<br><br>
+
+  Edit the <subsystem> section for Undertow, or add it if it doesn’t exist.
+
+````
+<subsystem xmlns="urn:jboss:domain:undertow:13.0">
+
+    <server name="default-server">
+        <host name="default-host" alias="localhost">
+            <location name="/" handler="welcome-content"/>
+            <filter-ref name="Access-Control-Allow-Origin"/>
+        </host>
+    </server>
+    <filters>
+        <response-header name="Access-Control-Allow-Origin" header-name="Access-Control-Allow-Origin" header-value="*"/>
+        <response-header name="Access-Control-Allow-Credentials" header-name="Access-Control-Allow-Credentials" header-value="true"/>
+        <response-header name="Access-Control-Allow-Headers" header-name="Access-Control-Allow-Headers" header-value="Content-Type, Authorization"/>
+        <response-header name="Access-Control-Allow-Methods" header-name="Access-Control-Allow-Methods" header-value="GET, POST, PUT, DELETE, OPTIONS"/>
+
+    </filters>
+</subsystem>
+
+
+````
+> 🛠 Be careful to place this within the correct <subsystem> block for Undertow. If there's already an undertow subsystem, don’t duplicate it—just add the <filters> and <filter-ref> inside the existing one.
+
+</details>
 
 ---
 
@@ -119,8 +170,13 @@ cd dishes-proj/user-services
 mvn clean install       # Builds the project
 mvn wildfly:deploy      # Deploys to WildFly
 ```
+
 ### Run the Seller-Inventory Services
-*To Be Added*
+```bash
+cd dishes-proj/seller-inventory-services
+mvn clean install
+mvn spring-boot:run
+```
 
 ### Run the Customer-Order-Payment Services
 
@@ -174,6 +230,9 @@ mvn spring-boot:run
 - **Endpoint:** `http://localhost:8081/api/customers/getCustomers`
 - **Request Body:** None
 </details>
+
+----
+
 
 #### For `Admin Services`:
 
@@ -238,3 +297,62 @@ mvn spring-boot:run
 - **Endpoint:** `http://localhost:8080/admin-services/api/admin/customers`
 - **Request Body:** None
 </details>
+
+----
+
+
+#### For `Seller-Inventory-services`:
+
+<details>
+<summary>🔹 Login Seller</summary>
+
+- **Method:** `POST`  
+- **Endpoint:** `http://localhost:8082/seller/login`  
+- **Request Body:**
+  ```json
+  {
+    "email":"The_email_done_in_the_admin_service_beforehand",
+    "companyName":"The_companyName_done_in_the_admin_service_beforehand",
+    "password":"The_password_done_in_the_admin_service_beforehand_and_send_through_the_email"
+  }
+  ```
+</details>
+
+<details>
+<summary>🔹 Add dish</summary>
+
+- **Method:** `POST`  
+- **Endpoint:** `http://localhost:8082/seller/products/add-dish`  
+- **Request Body:**
+  ```json
+  {
+    "name": "Molokhia",
+    "amount": 10,
+    "price": 100,
+    "shippingCompanyName": "Talabat"
+  }
+
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+<details>
+<summary>🔹 Get Dishes: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8082/seller/products/get-seller-dishes`
+- **Request Body:** None
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+----
+
