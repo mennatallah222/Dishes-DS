@@ -1,7 +1,7 @@
 # Online Dishes Project
 
 [![Java](https://img.shields.io/badge/Java-23-blue.svg)](https://www.oracle.com/java/)
-[![Maven](https://img.shields.io/badge/Maven-Build-success-brightgreen)](https://maven.apache.org/)
+[![Maven](https://img.shields.io/badge/Maven-Build)](https://maven.apache.org/)
 [![WildFly](https://img.shields.io/badge/WildFly-36.0.0.Final-blue)](https://www.wildfly.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Running-brightgreen)](https://spring.io/projects/spring-boot)
 
@@ -21,9 +21,13 @@
 
 - ✅ **Install Java JDK 23**  
   ⚠️ *Required for project dependencies.*
-- ✅ **Install WildFly (v36.0.0.Final)**  
+- ✅ **Install WildFly (v36.0.0.Final)**
+- ✅ **Install PostgreSQL**
+  - 🚨 *Ensure your username and password are both: **postgres*** 🚨
+
   📁 Recommended location: any folder **except** `C:\Program Files`
-- Create the 1st db and name it: **customer-order-payment-db**
+- Create the 1st db and name it: **admin-dishes**
+- Create the 2st db and name it: **customer-order-payment-db**
 - ✅ **Start WildFly Server**
   Open CMD as an Administrator, then navigate to:
 ```bash
