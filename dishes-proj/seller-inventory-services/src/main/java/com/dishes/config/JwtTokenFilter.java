@@ -3,9 +3,9 @@ package com.dishes.config;  // Or your preferred package
 import java.io.IOException;
 import java.util.Collections;
 
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,37 +27,36 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
 
-    final String authHeader = request.getHeader("Authorization");
-
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        filterChain.doFilter(request, response);
-        return;
-    }
-
-    try {
-        final String token = authHeader.substring(7);
-        
-        if (!jwtTokenUtil.validateToken(token)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT Token");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        Long sellerId = jwtTokenUtil.extractSellerId(token);
-        
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                sellerId, null, Collections.emptyList());
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        
-    }
-    catch (Exception e) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid Token");
-        return;
-    }
+        try {
+            final String token = authHeader.substring(7);
+            
+            if (!jwtTokenUtil.validateToken(token)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid JWT Token");
+                return;
+            }
 
-    filterChain.doFilter(request, response);
-}
+            Long sellerId = jwtTokenUtil.extractSellerId(token);
+            
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    sellerId, null, Collections.emptyList());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            
+        }
+        catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid Token");
+            return;
+        }
+
+        filterChain.doFilter(request, response);
+    }
 
 }
