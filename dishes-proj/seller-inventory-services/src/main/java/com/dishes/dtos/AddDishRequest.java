@@ -4,14 +4,6 @@ public class AddDishRequest {
     private String name;
     private int amount;
     private double price;
-    private String shippingCompanyName;
-    
-    public String getShippingCompanyName() {
-        return shippingCompanyName;
-    }
-    public void setShippingCompanyName(String shippingCompanyName) {
-        this.shippingCompanyName = shippingCompanyName;
-    }
     public int getAmount() {
         return amount;
     }
