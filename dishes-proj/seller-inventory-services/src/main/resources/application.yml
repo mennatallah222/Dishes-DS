@@ -20,7 +20,7 @@ resilience4j:
   circuitbreaker:
     instances:
       adminService:
-        failure-rate-threshold: 50  # Trip circuit after 50% failures
-        minimum-number-of-calls: 1  # Minimum calls before evaluating
-        sliding-window-size: 10      # Last 10 calls determine state
-        wait-duration-in-open-state: 10s  # Time before retrying
+        failure-rate-threshold: 50  #trip circuit after 50% failures
+        minimum-number-of-calls: 1  #min calls before evaluating
+        sliding-window-size: 10      #last 10 calls determine the state
+        wait-duration-in-open-state: 10s  #time before retrying
