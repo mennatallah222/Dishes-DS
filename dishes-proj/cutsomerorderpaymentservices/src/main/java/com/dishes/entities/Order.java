@@ -1,48 +1,94 @@
 package com.dishes.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "orders", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"name"})
-})
+@Table(name = "orders")
 public class Order {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private int amount;
+
+    @Column(nullable = false)
     private double total;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items=new ArrayList<>();
+    
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="shipping_company_id")
     private ShippingCompany shippingCompany;
-
+    
+    public List<OrderItem> getItems() {
+        return items;
+    }
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
     public ShippingCompany getShippingCompany() {
         return shippingCompany;
     }
     public void setShippingCompany(ShippingCompany shippingCompany) {
         this.shippingCompany = shippingCompany;
     }
+    
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public OrderStatus getStatus() {
+        return status;
+    }
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+    
+    public void calculateAndSetTotal() {
+        this.total = items.stream()
+        .mapToDouble(item -> item.getPrice() * item.getQuantity())
+        .sum();
+    }
+    
+    public double getTotal() {
+        return total;
+    }
 
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+        calculateAndSetTotal();
+    }
+    public void setTotal(double total) {
+        this.total = total;
+    }
+    
+    public Customer getCustomer() {
+        return customer;
+    }
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+    
+    
     public enum OrderStatus {
         Pending("available"),
+        Failed("failed"),
         Cancelled("cancelled"),
         Confirmed("confirmed");
-
+        
         private final String value;
         OrderStatus(String value) {
             this.value = value;
@@ -51,36 +97,7 @@ public class Order {
             return value;
         }
     }
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public int getAmount() {
-        return amount;
-    }
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-    public double getTotal() {
-        return total;
-    }
-    public void setPrice(double total) {
-        this.total = total;
-    }
-    public OrderStatus getStatus() {
-        return status;
-    }
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
+    
 }
+
 

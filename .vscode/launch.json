@@ -6,6 +6,13 @@
       "name": "RabbitMQConsumer",
       "request": "launch",
       "mainClass": "com.dishes.rabbitmq.RabbitMQConsumer",
+      "projectName": "admin-services"
+    },
+    {
+      "type": "java",
+      "name": "RabbitMQConsumer",
+      "request": "launch",
+      "mainClass": "com.dishes.rabbitmq.RabbitMQConsumer",
       "projectName": "admin-service"
     },
     {

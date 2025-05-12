@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 
 import com.dishes.dtos.AddDishRequest;
 import com.dishes.dtos.ProductResponse;
+import com.dishes.dtos.ProductSoldResponse;
 import com.dishes.entities.Product;
 import com.dishes.entities.Product.ProductStatus;
 import com.dishes.jwt.JwtTokenUtil;
 import com.dishes.entities.Seller;
+import com.dishes.entities.SoldProduct;
 import com.dishes.repositories.ProductRepository;
 import com.dishes.repositories.SellerRespository;
+import com.dishes.repositories.SoldProductRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -19,10 +22,12 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class ProductService {
     private final ProductRepository productRepository;
+    private final SoldProductRepository soldProductRepository;
     private final SellerRespository sellerRespository;
     private final JwtTokenUtil token;
 
-    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token/*, ShippingCompanyRepository shippingCompanyRepository*/) {
+    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token, SoldProductRepository soldProductRepository) {
+        this.soldProductRepository=soldProductRepository;
         this.productRepository = productRepository;
         this.sellerRespository=sellerRespository;
         this.token=token;
@@ -42,27 +47,47 @@ public class ProductService {
         if (exists) {
             return null;
         }
-        seller.setId(sellerId);
-
         Product newDish = new Product();
         newDish.setName(dish.getName());
         newDish.setAmount(dish.getAmount());
         newDish.setPrice(dish.getPrice());
-        newDish.setStatus(dish.getAmount() > 0 ? ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
+        newDish.setStatus(dish.getAmount()>0?ProductStatus.AVAILABLE:ProductStatus.SOLD_OUT);
         newDish.setSeller(seller);
 
         Product savedDProduct=productRepository.save(newDish);
-        return convertToResponse(savedDProduct);
+        return mapToProductResponse(savedDProduct);
     }
 
     public List<ProductResponse> getProductsBySeller(String authHeader) {
         Long sellerId=token.extractSellerId(authHeader.substring(7));
         return productRepository.findBySellerId(sellerId).stream()
-                .map(this::convertToResponse)
+                .map(this::mapToProductResponse)
                 .toList();
     }
 
-    private ProductResponse convertToResponse(Product product) {
+    public List<ProductSoldResponse> getSoldProducts(String authHeader) {
+        Long sellerId = token.extractSellerId(authHeader.substring(7));
+        return soldProductRepository.findBySellerId(sellerId).stream().map(this::mapToSoldResponse).toList();
+    }
+
+    public List<ProductResponse> getAvailableProducts(String authHeader) {
+        Long sellerId = token.extractSellerId(authHeader.substring(7));
+        return productRepository.findBySellerIdAndStatus(sellerId, ProductStatus.AVAILABLE).stream().map(this::mapToProductResponse).toList();
+    }
+
+
+    private ProductSoldResponse mapToSoldResponse(SoldProduct item) {
+        ProductSoldResponse response = new ProductSoldResponse();
+        response.setName(item.getProductName());
+        response.setPrice(item.getPrice());
+        response.setCustomerName(item.getCustomerName());
+        response.setCustomerEmail(item.getCustomerEmail());
+        response.setCompanyName(item.getShippingCompany());
+        return response;
+    }
+
+
+    private ProductResponse mapToProductResponse(Product product) {
         ProductResponse response = new ProductResponse();
         response.setId(product.getId());
         response.setName(product.getName());
@@ -71,4 +96,5 @@ public class ProductService {
         response.setStatus(product.getStatus().name());
         return response;
     }
+
 }

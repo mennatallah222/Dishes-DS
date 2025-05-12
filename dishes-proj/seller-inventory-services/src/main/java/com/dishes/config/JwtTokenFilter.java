@@ -1,4 +1,4 @@
-package com.dishes.config;  // Or your preferred package
+package com.dishes.config;
 
 import java.io.IOException;
 import java.util.Collections;

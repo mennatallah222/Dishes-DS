@@ -1,6 +1,6 @@
 package com.dishes.rabbitmq;
 
-import com.rabbitmq.client.*;  // Correct RabbitMQ import
+import com.rabbitmq.client.*;
 
 import com.dishes.dtos.CredentialsMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,6 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -56,9 +55,14 @@ public class RabbitMQConsumer {
 
     private static void sendEmail(String to, String companyName, String password) {
         Properties emailProps = new Properties();
-        try (InputStream input = new FileInputStream("email.properties")) {
+        try (InputStream input =RabbitMQConsumer.class.getClassLoader().getResourceAsStream("email.properties")) {
+            if (input == null) {
+                System.err.println("email.properties not found in classpath!");
+                return;
+            }
             emailProps.load(input);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return;
         }
