@@ -231,6 +231,42 @@ mvn spring-boot:run
 - **Request Body:** None
 </details>
 
+
+<details>
+<summary>🔹 Add Order: </summary>
+
+- **Method:** `POST`
+- **Endpoint:** ``
+- **Request Body:**
+  ```json
+  {
+    "customerId": 1,
+    "items": [
+      {
+        "productId": 9,
+        "sellerId": 5,
+        "quantity": 1,
+        "price":100
+      },
+      {
+        "productId": 11,
+        "sellerId": 7,
+        "quantity": 2,
+        "price":100
+      }
+    ],
+    "shippingCompanyName": "Flyo"
+  }
+  ```
+  
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
 ----
 
 
@@ -328,8 +364,7 @@ mvn spring-boot:run
   {
     "name": "Molokhia",
     "amount": 10,
-    "price": 100,
-    "shippingCompanyName": "Talabat"
+    "price": 100
   }
 
 - **Headers:**   
@@ -345,6 +380,35 @@ mvn spring-boot:run
 
 - **Method:** `GET`
 - **Endpoint:** `http://localhost:8082/seller/products/get-seller-dishes`
+- **Request Body:** None
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+
+<details>
+<summary>🔹 Get Seller's <code>Sold</code> Dishes: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8082/seller/products/get-sold-dishes`
+- **Request Body:** None
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+<details>
+<summary>🔹 Get Seller's <em><code>Currently for Sale</code></em> Dishes: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8082/seller/products/get-available-dishes`
 - **Request Body:** None
 - **Headers:**   
   > ```
