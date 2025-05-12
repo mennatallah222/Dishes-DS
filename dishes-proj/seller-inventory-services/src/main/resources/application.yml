@@ -15,6 +15,12 @@ spring:
     port: 5672
     username: guest
     password: guest
+    listener:
+      simple:
+        default-requeue-rejected: false
+        message-converter: jackson2JsonMessageConverter
+    template:
+      message-converter: jackson2JsonMessageConverter
 
 resilience4j:
   circuitbreaker:

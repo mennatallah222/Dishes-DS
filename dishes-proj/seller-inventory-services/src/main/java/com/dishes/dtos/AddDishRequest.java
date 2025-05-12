@@ -1,8 +1,16 @@
 package com.dishes.dtos;
 
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 public class AddDishRequest {
+    @NotBlank(message = "Dish name is required")
     private String name;
     private int amount;
+
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be greater than zero")
     private double price;
     public int getAmount() {
         return amount;

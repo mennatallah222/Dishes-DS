@@ -5,6 +5,11 @@ public class OrderResponse {
     private double total;
     private String status;
     private String shippingCompany;
+
+    private String errorMessage;
+    private String errorCode;
+
+    
     public Long getId() {
         return id;
     }
@@ -28,5 +33,17 @@ public class OrderResponse {
     }
     public void setShippingCompany(String shippingCompany) {
         this.shippingCompany = shippingCompany;
+    }
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+    public String getErrorCode() {
+        return errorCode;
+    }
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 }

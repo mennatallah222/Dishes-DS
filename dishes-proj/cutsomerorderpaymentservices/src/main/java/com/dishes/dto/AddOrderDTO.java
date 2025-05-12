@@ -1,25 +1,28 @@
 package com.dishes.dto;
 
+import java.util.List;
+
 public class AddOrderDTO {
-    private Long id;
-    private double total;
-    private String shippingCompany;
-    public Long getId() {
-        return id;
+    private Long customerId;
+    private String shippingCompanyName;
+    private List<OrderItemDTO> items;
+    public Long getCustomerId() {
+        return customerId;
     }
-    public void setId(Long id) {
-        this.id = id;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
-    public double getTotal() {
-        return total;
+    public String getShippingCompanyName() {
+        return shippingCompanyName;
     }
-    public void setTotal(double total) {
-        this.total = total;
+    public void setShippingCompanyName(String shippingCompanyName) {
+        this.shippingCompanyName = shippingCompanyName;
     }
-    public String getShippingCompany() {
-        return shippingCompany;
+    public List<OrderItemDTO> getItems() {
+        return items;
     }
-    public void setShippingCompany(String shippingCompany) {
-        this.shippingCompany = shippingCompany;
+    public void setItems(List<OrderItemDTO> items) {
+        this.items = items;
     }
+    
 }

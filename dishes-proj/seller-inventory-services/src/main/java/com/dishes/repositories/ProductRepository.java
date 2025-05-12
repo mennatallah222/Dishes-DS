@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.dishes.entities.Product;
 import com.dishes.entities.Seller;
 
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>{
     //Jparepository class provides CRUD ops by default :)
@@ -19,4 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
     List<Product> findByPriceBetween(double minPrice, double maxPrice);
     boolean existsByNameAndSeller(String name, Seller seller);
 
+    List<Product> findBySellerIdAndStatus(Long sellerId, Product.ProductStatus status);
+    
 }
