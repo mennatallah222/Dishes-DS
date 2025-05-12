@@ -418,5 +418,28 @@ mvn spring-boot:run
 
 </details>
 
+
+<details>
+<summary>🔹 Update a dish: </summary>
+
+- **Method:** `PUT`
+- **Endpoint:** `http://localhost:8082/seller/products/update-dish/dishId`
+- **Request Body:**
+- ```json
+  {
+    "name": "Updated Name",
+    "amount": 15,
+    "price": 12000
+  }
+  ```
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+
 ----
 
