@@ -45,6 +45,7 @@ public class AuthService {
         return Jwts.builder()
                 .setSubject(Long.toString(customer.getId()))
                 .claim("id", customer.getId())
+                .claim("role", "CUSTOMER")
                 .claim("email", customer.getEmail())
                 .claim("name", customer.getName())
                 .setIssuedAt(now)

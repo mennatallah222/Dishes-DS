@@ -11,8 +11,11 @@ import com.dishes.dto.ErrorResponse;
 import com.dishes.dto.OrderResponse;
 import com.dishes.services.OrderService;
 
+import jakarta.annotation.security.RolesAllowed;
+
 @RestController
 @RequestMapping("/orders")
+@RolesAllowed("CUSTOMER")
 public class OrderController {
     private final OrderService orderService;
     public OrderController(OrderService orderService) {

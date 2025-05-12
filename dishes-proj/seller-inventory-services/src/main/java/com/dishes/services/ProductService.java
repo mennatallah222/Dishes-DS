@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.dishes.dtos.AddDishRequest;
 import com.dishes.dtos.ProductResponse;
 import com.dishes.dtos.ProductSoldResponse;
+import com.dishes.dtos.UpdateProductRequest;
 import com.dishes.entities.Product;
 import com.dishes.entities.Product.ProductStatus;
 import com.dishes.jwt.JwtTokenUtil;
@@ -73,6 +74,33 @@ public class ProductService {
     public List<ProductResponse> getAvailableProducts(String authHeader) {
         Long sellerId = token.extractSellerId(authHeader.substring(7));
         return productRepository.findBySellerIdAndStatus(sellerId, ProductStatus.AVAILABLE).stream().map(this::mapToProductResponse).toList();
+    }
+
+    public ProductResponse updateDish(Long dishId, UpdateProductRequest request, String authHeader) {
+        Long sellerId = token.extractSellerId(authHeader.substring(7));
+        Product existingDish = productRepository.findByIdAndSellerId(dishId, sellerId)
+                .orElse(null);
+        
+        if (existingDish == null) {
+            return null;
+        }        
+        boolean nameExists = productRepository.existsByNameAndSellerAndIdNot(
+                request.getName(), 
+                existingDish.getSeller(), 
+                dishId);
+        
+        if (nameExists) {
+            return null;
+        }
+        
+        existingDish.setName(request.getName());
+        existingDish.setAmount(request.getAmount());
+        existingDish.setPrice(request.getPrice());
+        existingDish.setStatus(request.getAmount() > 0 ? 
+                ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
+        
+        Product updatedProduct = productRepository.save(existingDish);
+        return mapToProductResponse(updatedProduct);
     }
 
 
