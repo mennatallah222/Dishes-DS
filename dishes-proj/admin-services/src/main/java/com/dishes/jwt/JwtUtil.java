@@ -17,6 +17,7 @@ public class JwtUtil {
         return Jwts.builder()
             .setSubject(sellerId.toString())
             .claim("sellerId", sellerId)
+            .claim("role", "SELLER")
             .claim("email", sellerEmail)
             .claim("companyName", companyName)
             .setIssuedAt(new Date())
