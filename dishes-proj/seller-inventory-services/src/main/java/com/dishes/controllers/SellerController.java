@@ -18,6 +18,11 @@ public class SellerController {
         this.authService = authService;
     }
 
+    @GetMapping("/healthCheck")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Seller service is healthy!");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody SellerLoginRequest request) {
         SellerLoginResponse response = authService.authenticateSeller(request);

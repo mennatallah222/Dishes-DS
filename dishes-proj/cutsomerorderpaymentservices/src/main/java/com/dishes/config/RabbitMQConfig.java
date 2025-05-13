@@ -1,11 +1,17 @@
 package com.dishes.config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
+
+import com.dishes.dtos.OrderProcessedResponse;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 @Configuration
 public class RabbitMQConfig {
@@ -49,6 +55,17 @@ public class RabbitMQConfig {
 
     @Bean
     public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper() {
+            @Override
+            @NonNull
+            public JavaType toJavaType(@NonNull MessageProperties properties) {
+                //this is to convert to OrderProcessedResponse regardless of type info --> problem of dtos here and dto there :')
+                return TypeFactory.defaultInstance().constructType(OrderProcessedResponse.class);
+            }
+        };
+        converter.setJavaTypeMapper(typeMapper);
+        return converter;
     }
+    
 }

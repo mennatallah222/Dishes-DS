@@ -2,6 +2,11 @@ package com.dishes.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.ServiceUnavailableException;
 
@@ -15,11 +20,11 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dishes.config.RabbitMQConfig;
-import com.dishes.dto.AddOrderDTO;
-import com.dishes.dto.OrderProcessedResponse;
-import com.dishes.dto.OrderResponse;
-import com.dishes.dto.rmq.OrderItemEvent;
-import com.dishes.dto.rmq.OrderPlacedEvent;
+import com.dishes.dtos.AddOrderDTO;
+import com.dishes.dtos.OrderProcessedResponse;
+import com.dishes.dtos.OrderResponse;
+import com.dishes.dtos.rmq.OrderItemEvent;
+import com.dishes.dtos.rmq.OrderPlacedEvent;
 import com.dishes.entities.Order;
 import com.dishes.entities.OrderItem;
 import com.dishes.entities.ShippingCompany;
@@ -44,31 +49,32 @@ public class OrderService {
     private final RestTemplate restTemplate;
     private final String sellerServiceURL;
 
+    private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+    private final ConcurrentHashMap<Long, CompletableFuture<OrderResponse>> pendingOrders=new ConcurrentHashMap<>();
+
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
 
     private final CircuitBreaker circuitBreaker;
-    private volatile boolean isSellerServiceAvailable = false;
-
     public OrderService(ShippingCompanyRepository shippingCompanyRepository, 
                       CustomerRepository customerRepository, 
                       OrderRepository orderRepository, 
                       RabbitTemplate rabbitTemplate,
                       RestTemplate restTemplate,
                       CircuitBreakerFactory<?, ?> circuitBreakerFactory
-                    ) {
+                    ){
         this.shippingCompanyRepository = shippingCompanyRepository;
         this.customerRepository = customerRepository;
         this.orderRepository = orderRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.restTemplate=restTemplate;
-        this.sellerServiceURL="http://localhost:8082";
+        this.sellerServiceURL="http://localhost:8082/seller/healthCheck";
         this.circuitBreaker=circuitBreakerFactory.create("sellerServiceCircuitBreaker");
     }
 
     @Scheduled(fixedRate = 30000)
-    public void performHealthCheck() {
-        isSellerServiceAvailable = (circuitBreaker).run(
+    public void healthCheck() {
+        (circuitBreaker).run(
             () -> checkSellerServiceHealth(),
             throwable -> {
                 log.error("Health check failed", throwable);
@@ -89,13 +95,16 @@ public class OrderService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public OrderResponse addOrder(AddOrderDTO request, String authHeader) throws ServiceUnavailableException {
+    public CompletableFuture<OrderResponse> addOrder(AddOrderDTO request, String authHeader) throws ServiceUnavailableException {
+
+        CompletableFuture<OrderResponse> responseFuture=new CompletableFuture<>();
         if(!isSellerServiceAvailable()){
             OrderResponse response = new OrderResponse();
             response.setStatus("FAILED");
             response.setErrorMessage("Seller service is currently unavailable!😔");
             response.setErrorCode("SERVICE_UNAVAILABLE");
-            return response;
+            responseFuture.complete(response);
+            return responseFuture;
         }
 
         Order order = new Order();
@@ -134,15 +143,43 @@ public class OrderService {
 
         order.setShippingCompany(shippingCompany);
         Order savedOrder = orderRepository.save(order);
-        savedOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
+        pendingOrders.put(savedOrder.getId(), responseFuture);
+        
+        Order reloadedOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
 
-        OrderPlacedEvent event = new OrderPlacedEvent();
-        event.setOrderId(savedOrder.getId());
-        event.setCustomerId(savedOrder.getCustomer().getId());
-        event.setCustomerName(savedOrder.getCustomer().getName());
-        event.setCustomerEmail(savedOrder.getCustomer().getEmail());
-        event.setShippingCompany(savedOrder.getShippingCompany().getName());
-        event.setItems(savedOrder.getItems().stream()
+        OrderPlacedEvent event = getOrderPlaceEvent(reloadedOrder);
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, "order.placed", event, message ->{
+                message.getMessageProperties().setReplyTo(RabbitMQConfig.ORDER_RESPONSES_QUEUE);
+                message.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
+                return message;
+            });
+
+        scheduledExecutor.schedule(() -> {
+            if (!responseFuture.isDone()) {
+                OrderResponse timeoutResponse=convertToResponse(reloadedOrder);
+                timeoutResponse.setStatus("FAILED");
+                timeoutResponse.setMessage("Order processing timed out");
+                timeoutResponse.setErrorCode("TIMEOUT");
+                responseFuture.complete(timeoutResponse);
+                pendingOrders.remove(savedOrder.getId());
+
+                reloadedOrder.setStatus(Order.OrderStatus.Failed);
+                orderRepository.save(order);
+            }
+        }, 30, TimeUnit.SECONDS);
+
+        return responseFuture;
+    }
+
+    OrderPlacedEvent getOrderPlaceEvent(Order o){
+        OrderPlacedEvent event=new OrderPlacedEvent();
+        event.setOrderId(o.getId());
+        event.setCustomerId(o.getCustomer().getId());
+        event.setCustomerName(o.getCustomer().getName());
+        event.setCustomerEmail(o.getCustomer().getEmail());
+        event.setShippingCompany(o.getShippingCompany().getName());
+        event.setItems(o.getItems().stream()
                 .map(item -> {
                     OrderItemEvent itemEvent = new OrderItemEvent();
                     itemEvent.setProductId(item.getProductId());
@@ -153,21 +190,8 @@ public class OrderService {
                     return itemEvent;
                 })
                 .toList());
-
-        rabbitTemplate.convertSendAndReceive(
-            RabbitMQConfig.ORDERS_EXCHANGE, 
-            "order.placed",
-            event,
-            message -> {
-                message.getMessageProperties().setReplyTo(RabbitMQConfig.ORDER_RESPONSES_QUEUE);
-                message.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
-                return message;
-            }
-        );
-
-        return convertToResponse(savedOrder);
+        return event;
     }
-
     private boolean isSellerServiceAvailable() {
         try {
             restTemplate.getForEntity(sellerServiceURL, String.class);
@@ -179,20 +203,40 @@ public class OrderService {
     }
     @RabbitListener(queues = RabbitMQConfig.ORDER_RESPONSES_QUEUE)
     public void handleOrderResponse(OrderProcessedResponse response) {
-        Order order = orderRepository.findById(response.getOrderId())
-            .orElseThrow(() -> new RuntimeException("Order not found: " + response.getOrderId()));
 
-        if(response.isSuccess()) {
-            order.setStatus(Order.OrderStatus.Confirmed);
+        CompletableFuture<OrderResponse> resFuture=pendingOrders.remove(response.getOrderId());
+
+        if(resFuture!=null){
+            Order order = orderRepository.findById(response.getOrderId())
+                .orElseThrow(() -> new RuntimeException("Order not found: " + response.getOrderId()));
+            OrderResponse orderResponse=new OrderResponse();
+            orderResponse.setId(order.getId());
+            orderResponse.setShippingCompany(order.getShippingCompany().getName());
+            orderResponse.setTotal(order.getTotal());
+
+            if(response.isSuccess()) {
+                order.setStatus(Order.OrderStatus.Confirmed);
+                orderResponse.setStatus("SUCCESS");
+                orderResponse.setMessage("Order is confirmed successfully!");
+            }
+            else{   //rollback the order actions
+                order.setStatus(Order.OrderStatus.Failed);
+                System.out.println("Order failed: " + response.getMessage());
+                orderResponse.setStatus("FAILED");
+                orderResponse.setMessage(response.getMessage());
+                orderResponse.setErrorCode(response.getFailReason());
+            }
+            
             orderRepository.save(order);
-            //to send a confirmation notification here: ****TODO****
+            resFuture.complete(orderResponse);
+            sendOrderNotification(order.getCustomer().getId(), orderResponse);
         }
-        else{   //rollback the order actions
-            order.setStatus(Order.OrderStatus.Failed);
-            System.out.println("Order failed: " + response.getMessage());
-            //to send a confirmation notification here: ****TODO****
-        }
-        
+
+    }
+
+    private void sendOrderNotification(Long customerId, OrderResponse response) {
+        //notification logic using websocket
+        //RabbitMQ to send to Notification Service?
     }
 
     private OrderResponse convertToResponse(Order order) {
@@ -208,4 +252,5 @@ public class OrderService {
         response.setTotal(total);
         return response;
     }
+
 }

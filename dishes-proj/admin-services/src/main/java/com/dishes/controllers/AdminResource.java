@@ -8,6 +8,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import com.dishes.dtos.SellerResponse;
 import com.dishes.entities.Admin;
 import com.dishes.services.AdminServiceBean;
 import com.dishes.services.CustomerServiceBean;
+import com.dishes.startup.AdminInitializer;
 
 @Path("/admin")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -28,6 +30,10 @@ public class AdminResource {
     private AdminServiceBean adminService;
     @Inject
     private CustomerServiceBean customerService;
+
+    @Inject
+    private AdminInitializer adminInitializer;
+
 
     @POST
     @Path("/login")
@@ -84,5 +90,25 @@ public class AdminResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         return Response.ok(seller).build();
+    }
+
+    @GET
+    @Path("/min-order-charge")
+    public Response getMinimumOrderCharge() {
+        return Response.ok(adminInitializer.getMinimumOrderCharge()).build();
+    }
+
+    //to change the min charge: put request
+
+    @POST
+    @Path("/min-order-charge")
+    public Response setMinimumOrderCharge(@QueryParam("charge") BigDecimal newCharge) {
+        if (newCharge.compareTo(BigDecimal.ZERO) < 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                   .entity("Minimum charge cannot be negative")
+                   .build();
+        }
+        adminInitializer.setMinimumOrderCharge(newCharge);
+        return Response.ok().entity("Minimum charge updated to: " + newCharge).build();
     }
 }

@@ -1,5 +1,7 @@
 package com.dishes.clients;
 
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -16,6 +18,7 @@ import com.dishes.dtos.UserDTO;
 public class CustomerServiceClient {
     private final String CUSTOMER_SERVICE_URL="http://localhost:8081/api/customers/getCustomers";
     
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<UserDTO> getAllCustomers(){
         Client c=ClientBuilder.newClient();
         try{

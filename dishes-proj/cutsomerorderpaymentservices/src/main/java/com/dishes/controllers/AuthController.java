@@ -1,7 +1,7 @@
 package com.dishes.controllers;
 
-import com.dishes.dto.AuthResponse;
-import com.dishes.dto.LoginDTO;
+import com.dishes.dtos.AuthResponse;
+import com.dishes.dtos.LoginDTO;
 import com.dishes.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

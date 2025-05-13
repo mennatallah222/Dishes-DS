@@ -1,15 +1,22 @@
-package com.dishes.dto;
+package com.dishes.dtos;
 
 public class OrderResponse {
     private Long id;
     private double total;
     private String status;
     private String shippingCompany;
+    private String message;
 
     private String errorMessage;
     private String errorCode;
-
     
+    
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
     public Long getId() {
         return id;
     }

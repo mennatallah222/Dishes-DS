@@ -14,12 +14,15 @@ import com.dishes.jwt.JwtUtil;
 import com.dishes.rabbitmq.RabbitMQProducer;
 
 import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 
 @Stateless
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class AdminServiceBean {
 
     @PersistenceContext(unitName = "userPU")
@@ -46,7 +49,7 @@ public class AdminServiceBean {
         return null;
     }
 
-
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public CompanyCreationResult createCompanyReps(List<CompanyDTO> companyDTOs) {
         List<CompanyDTO> createdReps = new ArrayList<>();
         List<String> skippedMsgs = new ArrayList<>();

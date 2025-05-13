@@ -1,6 +1,6 @@
 package com.dishes.controllers;
 
-import com.dishes.dto.AuthResponse;
+import com.dishes.dtos.AuthResponse;
 import com.dishes.entities.Customer;
 import com.dishes.services.AuthService;
 import com.dishes.services.CustomerService;

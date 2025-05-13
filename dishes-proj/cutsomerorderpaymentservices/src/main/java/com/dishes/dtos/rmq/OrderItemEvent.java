@@ -1,4 +1,4 @@
-package com.dishes.dto.rmq;
+package com.dishes.dtos.rmq;
 
 
 public class OrderItemEvent{
