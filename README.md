@@ -118,23 +118,34 @@ standalone.bat
   Edit the <subsystem> section for Undertow, or add it if it doesn’t exist.
 
 ````
-<subsystem xmlns="urn:jboss:domain:undertow:13.0">
-
-    <server name="default-server">
-        <host name="default-host" alias="localhost">
-            <location name="/" handler="welcome-content"/>
-            <filter-ref name="Access-Control-Allow-Origin"/>
-        </host>
-    </server>
-    <filters>
-        <response-header name="Access-Control-Allow-Origin" header-name="Access-Control-Allow-Origin" header-value="*"/>
-        <response-header name="Access-Control-Allow-Credentials" header-name="Access-Control-Allow-Credentials" header-value="true"/>
-        <response-header name="Access-Control-Allow-Headers" header-name="Access-Control-Allow-Headers" header-value="Content-Type, Authorization"/>
-        <response-header name="Access-Control-Allow-Methods" header-name="Access-Control-Allow-Methods" header-value="GET, POST, PUT, DELETE, OPTIONS"/>
-
-    </filters>
-</subsystem>
-
+      <subsystem xmlns="urn:jboss:domain:undertow:community:14.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}" default-security-domain="other">
+            <byte-buffer-pool name="default"/>
+            <buffer-cache name="default"/>
+            <server name="default-server">
+                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
+                <host name="default-host" alias="localhost">
+                    <location name="/" handler="welcome-content"/>
+                    <http-invoker http-authentication-factory="application-http-authentication"/>
+                </host>
+            </server>
+            <servlet-container name="default">
+                <jsp-config/>
+                <websockets/>
+            </servlet-container>
+            <handlers>
+                <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
+            </handlers>
+            <filters>
+                <response-header name="Access-Control-Allow-Origin" header-name="Access-Control-Allow-Origin" header-value="*"/>
+                <response-header name="Access-Control-Allow-Credentials" header-name="Access-Control-Allow-Credentials" header-value="true"/>
+                <response-header name="Access-Control-Allow-Headers" header-name="Access-Control-Allow-Headers" header-value="Content-Type, Authorization"/>
+                <response-header name="Access-Control-Allow-Methods" header-name="Access-Control-Allow-Methods" header-value="GET, POST, PUT, DELETE, OPTIONS"/>
+            </filters>
+            <application-security-domains>
+                <application-security-domain name="other" security-domain="ApplicationDomain"/>
+            </application-security-domains>
+        </subsystem>
 
 ````
 > 🛠 Be careful to place this within the correct <subsystem> block for Undertow. If there's already an undertow subsystem, don’t duplicate it—just add the <filters> and <filter-ref> inside the existing one.
