@@ -15,6 +15,7 @@ public class RestApplication extends Application {
         Set<Class<?>> classes = new HashSet<>();
         classes.add(CORSFilter.class);
         classes.add(PreflightResource.class);
+         classes.add(AdminResource.class);
         return classes;
     }
 }

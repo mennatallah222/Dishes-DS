@@ -5,45 +5,43 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [name, setName] = useState('');
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-        setErrorMessage('Passwords do not match');
-        return;
-    }
-
-    try {
-        const response = await fetch('http://localhost:8081/api/customers/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const text = await response.text();
-        let result;
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            setErrorMessage('Passwords do not match');
+            return;
+        }
 
         try {
-            result = JSON.parse(text);
-        } catch {
-            result = { message: text };
+            const response = await fetch('http://localhost:8081/api/customers/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, password }),
+            });
+
+            const text = await response.text();
+            let result;
+
+            try {
+                result = JSON.parse(text);
+            } catch {
+                result = { message: text };
+            }
+
+            if (response.ok) {
+                alert(result.message || 'Registration successful');
+                navigate('/login'); 
+            } else {
+                setErrorMessage(result.message || 'Registration failed');
+            }
+        } catch (error) {
+            setErrorMessage('An error occurred. Please try again later.');
         }
-
-        if (response.ok) {
-            alert(result.message || 'Registration successful');
-            navigate('/login'); // 👈 navigate to Login component
-        } else {
-            setErrorMessage(result.message || 'Registration failed');
-        }
-    } catch (error) {
-        setErrorMessage('An error occurred. Please try again later.');
-    }
-};
-
-
-
+    };
     return (
         <div className="d-flex justify-content-center align-items-center" style={{
             height: '100vh',
@@ -51,15 +49,27 @@ const Register = () => {
             position: 'fixed',
             top: 0,
             left: 0,
-            backgroundColor: 'var(--background-color)', 
+            backgroundColor: 'var(--background-color)',
         }}>
             <div className="container p-4 border rounded shadow" style={{
                 maxWidth: '400px',
-                backgroundColor: 'white', 
+                backgroundColor: 'white',
             }}>
                 <h2 className="text-center" style={{ color: 'var(--primary-color)' }}>Register</h2>
                 {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="name" className="form-label">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            className="form-control"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email</label>
                         <input
@@ -94,7 +104,7 @@ const Register = () => {
                         />
                     </div>
                     <button type="submit" className="btn btn-primary w-100" style={{
-                        backgroundColor: 'var(--primary-color)', 
+                        backgroundColor: 'var(--primary-color)',
                         borderColor: 'var(--primary-color)',
                     }}>Register</button>
                 </form>

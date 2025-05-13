@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
-    const [role, setRole] = useState('customer'); // default role
+    const [role, setRole] = useState('customer'); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
@@ -19,7 +19,7 @@ const Login = () => {
                 url = 'http://localhost:8080/admin-services/api/admin/login';
                 break;
             case 'seller':
-                url = 'http://localhost:8080/seller/login';
+                url = 'http://localhost:8080/admin-services/api/admin/seller/login';
                 bodyData = { email, password, companyName }; 
                 break;
             default:
@@ -46,6 +46,12 @@ const Login = () => {
 
             if (response.ok) {
                 alert(result.message || 'Login successful');
+                if (role === 'admin') {
+            navigate('/admin/dashboard'); }
+             else if (role === 'seller') {
+        localStorage.setItem('token', result.token);
+        navigate('/seller/dashboard');
+        }
             } else {
                 setErrorMessage(result.message || 'Invalid credentials');
             }
