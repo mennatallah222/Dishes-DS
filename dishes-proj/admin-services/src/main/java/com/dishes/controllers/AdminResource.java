@@ -34,6 +34,12 @@ public class AdminResource {
     @Inject
     private AdminInitializer adminInitializer;
 
+    @OPTIONS
+    @Path("/login")
+    public Response preflightLogin() {
+        return Response.ok().build();
+    }
+
 
     @POST
     @Path("/login")

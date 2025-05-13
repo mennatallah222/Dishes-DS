@@ -201,6 +201,8 @@ public class OrderService {
             return false;
         }
     }
+    
+    
     @RabbitListener(queues = RabbitMQConfig.ORDER_RESPONSES_QUEUE)
     public void handleOrderResponse(OrderProcessedResponse response) {
 
@@ -215,9 +217,9 @@ public class OrderService {
             orderResponse.setTotal(order.getTotal());
 
             if(response.isSuccess()) {
-                order.setStatus(Order.OrderStatus.Confirmed);
+                order.setStatus(Order.OrderStatus.Completed);
                 orderResponse.setStatus("SUCCESS");
-                orderResponse.setMessage("Order is confirmed successfully!");
+                orderResponse.setMessage("Order is completed successfully!");
             }
             else{   //rollback the order actions
                 order.setStatus(Order.OrderStatus.Failed);

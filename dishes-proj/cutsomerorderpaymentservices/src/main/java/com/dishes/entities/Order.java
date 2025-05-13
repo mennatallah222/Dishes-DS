@@ -85,9 +85,10 @@ public class Order {
     
     public enum OrderStatus {
         Pending("available"),
-        Failed("failed"),
         Cancelled("cancelled"),
-        Confirmed("confirmed");
+        Confirmed("confirmed"),
+        Completed("completed"),
+        Failed("failed");
         
         private final String value;
         OrderStatus(String value) {
