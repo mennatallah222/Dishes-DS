@@ -1,6 +1,6 @@
 package com.dishes.services;
 
-import com.dishes.dto.AuthResponse;
+import com.dishes.dtos.AuthResponse;
 import com.dishes.entities.Customer;
 import com.dishes.repositories.CustomerRepository;
 import io.jsonwebtoken.Jwts;

@@ -1,14 +1,15 @@
 package com.dishes.controllers;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.naming.ServiceUnavailableException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.dishes.dto.AddOrderDTO;
-import com.dishes.dto.ErrorResponse;
-import com.dishes.dto.OrderResponse;
+import com.dishes.dtos.AddOrderDTO;
+import com.dishes.dtos.OrderResponse;
 import com.dishes.services.OrderService;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -23,11 +24,15 @@ public class OrderController {
     }
 
     @RequestMapping("/add-order")
-    public ResponseEntity<?> addOrder( @RequestHeader("Authorization") String authHeader, @RequestBody AddOrderDTO request) throws ServiceUnavailableException{
-        OrderResponse response = orderService.addOrder(request, authHeader);
-        if("FAILED".equals(response.getStatus())){
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new ErrorResponse(response.getErrorMessage(), response.getErrorCode()));
-        }
-        return ResponseEntity.ok(response);
+    public CompletableFuture<ResponseEntity<OrderResponse>> addOrder( @RequestHeader("Authorization") String authHeader, @RequestBody AddOrderDTO request) throws ServiceUnavailableException{
+        return orderService.addOrder(request, authHeader).thenApply(response->{
+            if("SUCCESS".equals(response.getStatus())){
+                return ResponseEntity.ok(response);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        
+        });
     }
 }

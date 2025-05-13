@@ -1,4 +1,4 @@
-package com.dishes.dto;
+package com.dishes.dtos;
 
 import java.util.List;
 
@@ -6,16 +6,24 @@ public class OrderProcessedResponse {
     private Long orderId;
     private boolean success;
     private String message;
+    private String failReason;
     private List<OrderItemResponse> items;
-
-    public OrderProcessedResponse(Long orderId, boolean success, String message, List<OrderItemResponse> items) {
+    
+    public OrderProcessedResponse(Long orderId, boolean success, String message, List<OrderItemResponse> items, String failReason) {
         this.orderId = orderId;
         this.success = success;
         this.message = message;
         this.items = items;
+        this.failReason=failReason;
     }
     public OrderProcessedResponse() {
         
+    }
+    public String getFailReason() {
+        return failReason;
+    }
+    public void setFailReason(String failReason) {
+        this.failReason = failReason;
     }
     public Long getOrderId() {
         return orderId;

@@ -45,6 +45,7 @@ public CorsConfigurationSource corsConfigurationSource() {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/seller/login").permitAll()
+                .requestMatchers("/seller/healthCheck").permitAll()
                 .requestMatchers("/seller/products/**").authenticated()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().denyAll()

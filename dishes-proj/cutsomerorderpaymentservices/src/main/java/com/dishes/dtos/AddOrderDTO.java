@@ -1,4 +1,4 @@
-package com.dishes.dto;
+package com.dishes.dtos;
 
 import java.util.List;
 
