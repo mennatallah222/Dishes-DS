@@ -16,6 +16,7 @@ public class RestApplication extends Application {
         classes.add(CORSFilter.class);
         classes.add(PreflightResource.class);
          classes.add(AdminResource.class);
+         classes.add(ConfigsResource.class);
         return classes;
     }
 }

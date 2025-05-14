@@ -1,5 +1,6 @@
 package com.dishes.services;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +24,7 @@ import com.dishes.config.RabbitMQConfig;
 import com.dishes.dtos.AddOrderDTO;
 import com.dishes.dtos.OrderProcessedResponse;
 import com.dishes.dtos.OrderResponse;
+import com.dishes.dtos.OrderRollbackEvent;
 import com.dishes.dtos.rmq.OrderItemEvent;
 import com.dishes.dtos.rmq.OrderPlacedEvent;
 import com.dishes.entities.Order;
@@ -160,6 +162,7 @@ public class OrderService {
                 OrderResponse timeoutResponse=convertToResponse(reloadedOrder);
                 timeoutResponse.setStatus("FAILED");
                 timeoutResponse.setMessage("Order processing timed out");
+                timeoutResponse.setUnavailableItems(Collections.emptyList());
                 timeoutResponse.setErrorCode("TIMEOUT");
                 responseFuture.complete(timeoutResponse);
                 pendingOrders.remove(savedOrder.getId());
@@ -204,6 +207,7 @@ public class OrderService {
     
     
     @RabbitListener(queues = RabbitMQConfig.ORDER_RESPONSES_QUEUE)
+    @Transactional
     public void handleOrderResponse(OrderProcessedResponse response) {
 
         CompletableFuture<OrderResponse> resFuture=pendingOrders.remove(response.getOrderId());
@@ -211,6 +215,7 @@ public class OrderService {
         if(resFuture!=null){
             Order order = orderRepository.findById(response.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Order not found: " + response.getOrderId()));
+
             OrderResponse orderResponse=new OrderResponse();
             orderResponse.setId(order.getId());
             orderResponse.setShippingCompany(order.getShippingCompany().getName());
@@ -218,23 +223,114 @@ public class OrderService {
 
             if(response.isSuccess()) {
                 order.setStatus(Order.OrderStatus.Completed);
-                orderResponse.setStatus("SUCCESS");
-                orderResponse.setMessage("Order is completed successfully!");
+                orderResponse.setStatus("COMPLETED");
+                orderResponse.setMessage("Order is completed successfully! Items reserved, proceed to checkout");
+                orderRepository.saveAndFlush(order);
             }
             else{   //rollback the order actions
                 order.setStatus(Order.OrderStatus.Failed);
                 System.out.println("Order failed: " + response.getMessage());
-                orderResponse.setStatus("FAILED");
+                orderResponse.setStatus("PENDING");
                 orderResponse.setMessage(response.getMessage());
+                orderResponse.setUnavailableItems(response.getItems());
                 orderResponse.setErrorCode(response.getFailReason());
+                orderRepository.saveAndFlush(order);
             }
             
-            orderRepository.save(order);
+            
             resFuture.complete(orderResponse);
             sendOrderNotification(order.getCustomer().getId(), orderResponse);
         }
 
     }
+
+
+    @Transactional
+    public OrderResponse checkoutOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        if (order.getStatus() != Order.OrderStatus.Completed) {
+            throw new IllegalStateException("Order is not in a checkout-able state");
+        }
+
+        try {
+            double minCharge = getMinimumOrderCharge();
+            OrderResponse response = new OrderResponse();
+            response.setId(order.getId());
+            response.setTotal(order.getTotal());
+            
+            if (order.getTotal() >= minCharge) {
+                order.setStatus(Order.OrderStatus.Confirmed);
+                response.setStatus("CONFIRMED");
+                response.setMessage("Order confirmed successfully");
+            }
+            else{
+                rollbackOrder(order);
+                order.setStatus(Order.OrderStatus.Failed);
+                response.setStatus("FAILED");
+                response.setMessage(String.format(
+                    "Order total %.2f is below minimum charge requirement of %.2f", 
+                    order.getTotal(), 
+                    minCharge
+                ));
+                response.setErrorCode("MIN_CHARGE_NOT_MET");
+            }
+            
+            orderRepository.save(order);
+            return response;
+        }
+        catch (Exception e) {
+            rollbackOrder(order);
+            order.setStatus(Order.OrderStatus.Failed);
+            orderRepository.save(order);
+            throw new RuntimeException("Checkout processing failed", e);
+        }
+    }
+
+    private double getMinimumOrderCharge() {
+        try {
+            ResponseEntity<Double> response = restTemplate.getForEntity(
+                "http://localhost:8080/admin-services/api/configs/min-order-charge", 
+                Double.class
+            );
+            Double body = response.getBody();
+            if (body == null) {
+                log.error("Minimum order charge response body is null");
+                throw new RuntimeException("Minimum order charge configuration is missing");
+            }
+            return body;
+        }
+        catch (Exception e) {
+            log.error("Failed to fetch minimum order charge", e);
+            throw new RuntimeException("Failed to fetch minimum order charge configuration");
+        }
+    }
+
+    private void rollbackOrder(Order order) {
+        try {
+            OrderRollbackEvent rollbackEvent = new OrderRollbackEvent();
+            rollbackEvent.setOrderId(order.getId());
+            rollbackEvent.setItems(order.getItems().stream()
+                .map(item -> {
+                    OrderItemEvent itemEvent = new OrderItemEvent();
+                    itemEvent.setProductId(item.getProductId());
+                    itemEvent.setQuantity(item.getQuantity());
+                    return itemEvent;
+                })
+                .toList());
+            
+            rabbitTemplate.convertAndSend(
+                RabbitMQConfig.ORDERS_EXCHANGE, 
+                "order.rollback", 
+                rollbackEvent
+            );
+        }
+        catch (Exception e) {
+            log.error("Failed to send rollback request for order {}", order.getId(), e);
+        }
+    }
+
 
     private void sendOrderNotification(Long customerId, OrderResponse response) {
         //notification logic using websocket

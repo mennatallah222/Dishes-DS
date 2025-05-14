@@ -1,3 +1,4 @@
+com\dishes\dtos\OrderRollbackEvent.class
 com\dishes\config\WebConfig$1.class
 com\dishes\repositories\CustomerRepository.class
 com\dishes\dtos\LoginDTO.class

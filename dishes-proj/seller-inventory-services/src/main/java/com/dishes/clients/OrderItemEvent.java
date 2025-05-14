@@ -7,6 +7,15 @@ public class OrderItemEvent {
     private String productName;
     private double price;
     private int quantity;
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     
     public Long getProductId() {
         return productId;

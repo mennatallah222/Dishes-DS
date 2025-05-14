@@ -52,6 +52,7 @@ public class ProductService {
         newDish.setName(dish.getName());
         newDish.setAmount(dish.getAmount());
         newDish.setPrice(dish.getPrice());
+        newDish.setImageUrl(dish.getImageUrl());
         newDish.setStatus(dish.getAmount()>0?ProductStatus.AVAILABLE:ProductStatus.SOLD_OUT);
         newDish.setSeller(seller);
 
@@ -111,6 +112,8 @@ public class ProductService {
         response.setCustomerName(item.getCustomerName());
         response.setCustomerEmail(item.getCustomerEmail());
         response.setCompanyName(item.getShippingCompany());
+        response.setImageUrl(item.getImageUrl());
+
         return response;
     }
 
@@ -122,6 +125,7 @@ public class ProductService {
         response.setAmount(product.getAmount());
         response.setPrice(product.getPrice());
         response.setStatus(product.getStatus().name());
+        response.setImageUrl(product.getImageUrl());
         return response;
     }
 

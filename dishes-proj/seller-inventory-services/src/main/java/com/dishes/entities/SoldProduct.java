@@ -10,6 +10,9 @@ public class SoldProduct {
     private Long id;
     
     private Long productId;
+    @Column(name = "order_id")
+    private Long orderId;
+    
     private String productName;
     private double price;
     private int quantity;
@@ -18,6 +21,16 @@ public class SoldProduct {
     private String customerName;
     private String customerEmail;
     private String shippingCompany;
+
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     public Long getId() {
         return id;
     }

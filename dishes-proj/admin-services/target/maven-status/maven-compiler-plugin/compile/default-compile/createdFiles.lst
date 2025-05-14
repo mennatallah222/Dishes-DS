@@ -15,6 +15,7 @@ com\dishes\entities\Admin.class
 com\dishes\entities\User.class
 com\dishes\configs\CORSFilter.class
 com\dishes\entities\CompanyRep.class
+com\dishes\controllers\ConfigsResource.class
 com\dishes\clients\CustomerServiceClient.class
 com\dishes\rabbitmq\RabbitMQConsumer.class
 com\dishes\dtos\CompanyCreationResult.class

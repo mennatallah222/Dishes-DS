@@ -23,20 +23,30 @@ public class Product {
     private String name;
     private int amount;
     private double price;
+    private String imageUrl;
+
+    
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="seller_id", nullable = false)
     private Seller seller;
-
+    
     public Seller getSeller() {
         return seller;
     }
     public void setSeller(Seller seller) {
         this.seller = seller;
     }
+    
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     
     public Long getId() {
         return id;

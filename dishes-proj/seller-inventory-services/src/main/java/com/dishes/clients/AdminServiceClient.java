@@ -15,8 +15,8 @@ public interface AdminServiceClient {
     @PostMapping("/admin-services/api/admin/seller/login")
     ResponseEntity<?> authenticateSeller(SellerLoginRequest req);
 
-    // @GetMapping("/admin-services/api/admin/config/min-order-charge")
-    // BigDecimal getMinOrderCharge();
+    @GetMapping("/admin-services/api/admin/config/min-order-charge")
+    BigDecimal getMinOrderCharge();
 
     
 }

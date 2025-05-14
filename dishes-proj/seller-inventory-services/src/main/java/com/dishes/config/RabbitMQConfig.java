@@ -16,6 +16,11 @@ public class RabbitMQConfig {
     }
     
     @Bean
+    public Queue rollbackQueue() {
+        return new Queue("seller.orders.rollback.queue", true);
+    }
+
+    @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }

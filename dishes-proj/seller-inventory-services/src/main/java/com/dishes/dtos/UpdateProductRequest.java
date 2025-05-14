@@ -16,6 +16,16 @@ public class UpdateProductRequest {
     @Min(value = 0, message = "Price cannot be negative")
     private double price;
 
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public String getName() {
         return name;
     }

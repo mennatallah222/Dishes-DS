@@ -12,6 +12,16 @@ public class AddDishRequest {
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be greater than zero")
     private double price;
+
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
     public int getAmount() {
         return amount;
     }

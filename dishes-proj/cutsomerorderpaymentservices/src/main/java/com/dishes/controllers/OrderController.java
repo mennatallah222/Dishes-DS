@@ -26,7 +26,7 @@ public class OrderController {
     @RequestMapping("/add-order")
     public CompletableFuture<ResponseEntity<OrderResponse>> addOrder( @RequestHeader("Authorization") String authHeader, @RequestBody AddOrderDTO request) throws ServiceUnavailableException{
         return orderService.addOrder(request, authHeader).thenApply(response->{
-            if("SUCCESS".equals(response.getStatus())){
+            if("COMPLETED".equals(response.getStatus())){
                 return ResponseEntity.ok(response);
             }
             else{
@@ -35,4 +35,18 @@ public class OrderController {
         
         });
     }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponse> checkoutOrder(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Long orderId) throws ServiceUnavailableException {
+        OrderResponse or= orderService.checkoutOrder(orderId);
+        if ("CONFIRMED".equals(or.getStatus())) {
+            return ResponseEntity.ok(or);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(or);
+        }
+    }
+
 }

@@ -20,10 +20,10 @@ public class AdminServiceClientFallback implements AdminServiceClient {
         return ResponseEntity.status(503).body(response);
     }
 
-    // @Override
-    // public BigDecimal getMinOrderCharge() {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getMinOrderCharge'");
-    // }
+    @Override
+    public BigDecimal getMinOrderCharge() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMinOrderCharge'");
+    }
     
 }
