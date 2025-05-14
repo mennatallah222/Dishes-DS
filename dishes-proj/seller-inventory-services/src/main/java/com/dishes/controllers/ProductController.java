@@ -22,7 +22,6 @@ import com.dishes.dtos.ProductSoldResponse;
 import com.dishes.dtos.UpdateProductRequest;
 import com.dishes.services.ProductService;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -34,7 +33,6 @@ public class ProductController {
         this.productService=productService;
     }
     @PostMapping("/add-dish")
-    @Transactional
     public ResponseEntity<?> addDish(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody AddDishRequest request) {
         try{
             System.out.println("Authentication: " + SecurityContextHolder.getContext().getAuthentication());
@@ -71,7 +69,6 @@ public class ProductController {
     }
 
     @PutMapping("/update-dish/{dishId}")
-    @Transactional
     public ResponseEntity<?> updateDish(@RequestHeader("Authorization") String authHeader, @PathVariable Long dishId, @Valid @RequestBody UpdateProductRequest request) {
         try {
             ProductResponse updatedDish = productService.updateDish(dishId, request, authHeader);

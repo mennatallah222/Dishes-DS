@@ -29,4 +29,5 @@ com\dishes\dtos\OrderItemResponse.class
 com\dishes\dtos\rmq\OrderPlacedEvent.class
 com\dishes\entities\Customer.class
 com\dishes\services\CustomerService.class
+com\dishes\jwt\JwtTokenUtil.class
 com\dishes\entities\Order.class

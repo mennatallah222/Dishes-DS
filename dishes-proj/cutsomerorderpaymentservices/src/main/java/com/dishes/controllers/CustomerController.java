@@ -1,6 +1,7 @@
 package com.dishes.controllers;
 
 import com.dishes.dtos.AuthResponse;
+import com.dishes.dtos.OrderResponse;
 import com.dishes.entities.Customer;
 import com.dishes.services.AuthService;
 import com.dishes.services.CustomerService;
@@ -48,5 +49,12 @@ public class CustomerController {
     public ResponseEntity<List<Customer>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
+
+    @GetMapping("/customer-orders")
+    public ResponseEntity<List<OrderResponse>> getOrdersByCustomer(@RequestHeader("Authorization") String authHeader) {
+        List<OrderResponse> orders = customerService.getAllOrdersByCustomerId(authHeader);
+        return ResponseEntity.ok(orders);
+    }
+
 
 }

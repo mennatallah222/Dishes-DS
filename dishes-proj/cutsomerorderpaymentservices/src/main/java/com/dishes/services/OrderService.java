@@ -120,6 +120,7 @@ public class OrderService {
                 item.setProductId(itemDto.getProductId());
                 item.setQuantity(itemDto.getQuantity());
                 item.setSellerId(itemDto.getSellerId());
+                item.setProductName(itemDto.getProductName());
                 item.setOrder(order);
                 item.setPrice(itemDto.getPrice());
                 order.addItem(item);
@@ -336,12 +337,20 @@ public class OrderService {
         response.setId(order.getId());
         response.setStatus(order.getStatus().name());
         response.setShippingCompany(order.getShippingCompany().getName());
-
-        double total = order.getItems().stream()
-            .mapToDouble(item -> item.getPrice() * item.getQuantity())
-            .sum();
-
-        response.setTotal(total);
+        response.setTotal(order.getTotal());
+        response.setItems(
+            order.getItems().stream()
+                .map(item -> {
+                    OrderItem itemDTO = new OrderItem();
+                    itemDTO.setProductId(item.getProductId());
+                    itemDTO.setProductName(item.getProductName());
+                    itemDTO.setQuantity(item.getQuantity());
+                    itemDTO.setPrice(item.getPrice());
+                    itemDTO.setSellerId(item.getSellerId());
+                    return itemDTO;
+                })
+                .toList()
+        );
         return response;
     }
 
