@@ -489,5 +489,25 @@ mvn spring-boot:run
 </details>
 
 
+<details>
+<summary>🔹 Get All Dishes: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8082/public/products/get-all-products`
+- **Request Body:** None
+- **Headers:** None 
+
+</details>
+
+<details>
+<summary>🔹 Get All Available Dishes: </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8082/public/products/get-all-available-products`
+- **Request Body:** None
+- **Headers:** None 
+
+</details>
+
 ----
 
