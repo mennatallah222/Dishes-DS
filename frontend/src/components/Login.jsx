@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 const Login = () => {
-    const [role, setRole] = useState('customer'); 
+    const [role, setRole] = useState('customer');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [companyName, setCompanyName] = useState('');
@@ -20,10 +20,10 @@ const Login = () => {
                 break;
             case 'seller':
                 url = 'http://localhost:8080/admin-services/api/admin/seller/login';
-                bodyData = { email, password, companyName }; 
+                bodyData = { email, password, companyName };
                 break;
             default:
-                url = 'http://localhost:8081/auth/login'; 
+                url = 'http://localhost:8081/auth/login';
         }
 
         try {
@@ -46,17 +46,22 @@ const Login = () => {
 
             if (response.ok) {
                 alert(result.message || 'Login successful');
+
                 if (role === 'admin') {
-            navigate('/admin/dashboard'); }
-             else if (role === 'seller') {
-        localStorage.setItem('token', result.token);
-        navigate('/seller/dashboard');
-        }
+                    navigate('/admin/dashboard');
+                } else if (role === 'seller') {
+                    localStorage.setItem('token', result.token);
+                    navigate('/seller/dashboard');
+                } else if (role === 'customer') {
+                    localStorage.setItem('token', result.token);
+                    navigate('/customer/dashboard');
+                }
             } else {
                 setErrorMessage(result.message || 'Invalid credentials');
             }
+
         } catch (error) {
-            setErrorMessage('An error occurred. Please try again later.'+error);
+            setErrorMessage('An error occurred. Please try again later.' + error);
         }
     };
 

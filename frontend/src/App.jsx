@@ -6,6 +6,7 @@ import Welcome from './pages/WelcomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import { Container } from 'react-bootstrap';
 import SellerDashboard from './pages/SellerDashboard';
+import CustomerDashboard from './pages/CustomerDashboard';
 function App() {
     return (
         <Router>
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/admin/dashboard" element={<AdminDashboard />} />
                     <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                     <Route path="/customer/dashboard" element={<CustomerDashboard />} />
                 </Routes>
             </Container>
         </Router>

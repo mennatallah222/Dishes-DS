@@ -7,43 +7,45 @@ const SellerDashboard = () => {
   const [editingDish, setEditingDish] = useState(null);
   const [showAvailable, setShowAvailable] = useState(false);
   const [showSold, setShowSold] = useState(false);
-  
+  const [showOnlySold, setShowOnlySold] = useState(false);
+  const [soldDishesOnly, setSoldDishesOnly] = useState([]);
+
   const token = localStorage.getItem('token');
 
   const handleAddDish = async (e) => {
-  e.preventDefault();
-  try {
-    const url = editingDish
-      ? `http://localhost:8082/seller/products/update-dish/${editingDish.id}`
-      : 'http://localhost:8082/seller/products/add-dish';
+    e.preventDefault();
+    try {
+      const url = editingDish
+        ? `http://localhost:8082/seller/products/update-dish/${editingDish.id}`
+        : 'http://localhost:8082/seller/products/add-dish';
 
-    const method = editingDish ? 'PUT' : 'POST';
+      const method = editingDish ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newDish)
-    });
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newDish)
+      });
 
-    if (!res.ok) {
-      const error = await res.text();
-      alert(`Error: ${error}`);
-      return;
+      if (!res.ok) {
+        const error = await res.text();
+        alert(`Error: ${error}`);
+        return;
+      }
+
+      const data = await res.json();
+      alert(editingDish ? 'Dish updated successfully' : 'Dish added successfully');
+      setNewDish({ name: '', price: '', amount: '', imageUrl: '' });
+      setEditingDish(null);
+      fetchDishes();
+      fetchSoldDishes();
+    } catch (err) {
+      console.error(err);
     }
-
-    const data = await res.json();
-    alert(editingDish ? 'Dish updated successfully' : 'Dish added successfully');
-    setNewDish({ name: '', price: '', amount: '', imageUrl: '' });
-    setEditingDish(null);
-    fetchDishes();
-    fetchSoldDishes();
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
 
   const fetchDishes = () => {
@@ -70,6 +72,18 @@ const SellerDashboard = () => {
       .then(res => res.json())
       .then(data => setSoldDishesDetails(data))
       .catch(err => console.error('Error fetching sold dishes:', err));
+  };
+  const fetchOnlySoldDishes = () => {
+    fetch('http://localhost:8082/seller/products/get-sold-dishes', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => setSoldDishesOnly(data))
+      .catch(err => console.error('Error fetching sold-only dishes:', err));
   };
 
   useEffect(() => {
@@ -227,27 +241,28 @@ const SellerDashboard = () => {
       accentColor: 'var(--primary-color)',
       cursor: 'pointer',
     },
-   dishImageContainer: {
-    width: '120px',
-    height: '120px',
-    marginBottom: '1rem',
-    position: 'relative',
-    overflow: 'hidden',
-    borderRadius: '12px',
-    border: '2px solid var(--primary-color)',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'scale(1.05)',
-      boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)'
-    }
-  },
-  dishImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    display: 'block'
-  },
+    dishImageContainer: {
+      width: '120px',
+      height: '120px',
+      marginBottom: '1rem',
+      position: 'relative',
+      overflow: 'hidden',
+      borderRadius: '12px',
+      border: '2px solid var(--primary-color)',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        transform: 'scale(1.05)',
+        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)'
+      }
+    },
+    dishImage: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      display: 'block'
+    },
+
   };
 
   return (
@@ -335,6 +350,19 @@ const SellerDashboard = () => {
             />
             Show Available Dishes
           </label>
+          <label style={styles.checkboxContainer}>
+            <input
+              type="checkbox"
+              checked={showOnlySold}
+              onChange={() => {
+                setShowOnlySold(prev => !prev);
+                if (!showOnlySold) fetchOnlySoldDishes();
+              }}
+              style={styles.checkboxInput}
+            />
+            Show Only Sold Dishes
+          </label>
+
         </div>
 
         {showSold && (
@@ -413,9 +441,116 @@ const SellerDashboard = () => {
             </ul>
           </>
         )}
+        {showOnlySold && (
+          <>
+            <h4 style={{
+              fontSize: '2rem',
+              fontWeight: '700',
+              textAlign: 'center',
+              color: '#FF7C71',
+              marginBottom: '2rem',
+              marginTop: '3rem',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}>
+              Sold Dishes
+            </h4>
+            <ul style={{
+              listStyleType: 'none',
+              padding: '0',
+              margin: '0',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '1.5rem',
+            }}>
+              {Object.entries(soldDishesOnly).length > 0 ? (
+                Object.entries(soldDishesOnly).map(([dishName, entries], groupIndex) => (
+                  <li key={groupIndex} style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                     backgroundImage: 'linear-gradient(to bottom right, var(--background-color), #fff)',
+                    padding: '1.5rem',
+                     border: '2px solid var(--primary-color)',
+                    borderRadius: '12px',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      boxShadow: '0 12px 36px rgba(0,0,0,0.2)',
+                    },
+                  }}>
+                    <div style={{
+                      fontSize: '1.3rem',
+                      fontWeight: '600',
+                      color: '#536001', 
+                      marginBottom: '1rem',
+                      textAlign: 'center',
+                    }}>
+                      {dishName} ({entries.length} sold)
+                    </div>
+                    {entries.map((entry, i) => (
+                      <div key={i} style={{
+                        padding: '0.5rem 0',
+                        borderBottom: i < entries.length - 1 ? '1px solid #ddd' : 'none',
+                        fontSize: '1.1rem',
+                        lineHeight: '1.5',
+                        color: '#555',
+                      }}>
+                        <strong>Product:</strong> {entry.productName}<br />
+                        <strong>Price:</strong> ${entry.price}<br />
+                        <strong>Customer Name:</strong> {entry.customerName || 'N/A'}<br />
+                        <strong>Customer Email:</strong> {entry.customerEmail || 'N/A'}<br />
+                        <strong>Company:</strong> {entry.companyName}<br />
+                        {entry.imageUrl && (
+                          <div style={{
+                            width: '360px',
+                            height: '360px', 
+                            marginTop: '1rem',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            borderRadius: '12px',
+                            boxShadow: '0 6px 18px rgba(0,0,0,0.1)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              transform: 'scale(1.05)',
+                              boxShadow: '0 6px 12px rgba(0, 0, 0, 0.2)',
+                            },
+                          }}>
+                            <img
+                              src={entry.imageUrl}
+                              alt={entry.productName}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
+                              }}
+                            />
+                          </div>
+                        )}
+                        {i < entries.length - 1 && <hr style={{ margin: '1rem 0', borderTop: '1px solid #FCD6AE' }} />}
+                      </div>
+                    ))}
+                  </li>
+                ))
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  color: '#777',
+                  fontSize: '1.2rem',
+                  padding: '2rem 0',
+                  borderRadius: '8px',
+                  backgroundColor: '#F9F9F9',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.1)',
+                }}>
+                  No sold dishes yet.
+                </div>
+              )}
+            </ul>
+          </>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default SellerDashboard;
