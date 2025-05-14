@@ -244,10 +244,10 @@ mvn spring-boot:run
 
 
 <details>
-<summary>🔹 Add Order: </summary>
+<summary>🔹 Add Order </summary>
 
 - **Method:** `POST`
-- **Endpoint:** ``
+- **Endpoint:** `http://localhost:8081/orders/add-order`
 - **Request Body:**
   ```json
   {
@@ -270,6 +270,20 @@ mvn spring-boot:run
   }
   ```
   
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+<details>
+<summary>🔹 Checkout Order </summary>
+
+- **Method:** `POST`
+- **Endpoint:** `http://localhost:8081/orders/checkout/{orderId}`
+- **Request Body:** None
 - **Headers:**   
   > ```
   > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
@@ -344,6 +358,29 @@ mvn spring-boot:run
 - **Endpoint:** `http://localhost:8080/admin-services/api/admin/customers`
 - **Request Body:** None
 </details>
+
+
+<details>
+  <summary>🔹 Get minimum charge </summary>
+  
+  - **Method:** `GET`
+  - **Endpoint:** `http://localhost:8080/admin-services/api/configs/min-order-charge`
+  - **Request Body:** None  
+  - **Headers:** None  
+
+</details>
+
+
+<details>
+  <summary>🔹 Set minimum charge </summary>
+  
+  - **Method:** `POST`
+  - **Endpoint:** `http://localhost:8081/admin/min-order-charge?charge=100`
+  - **Request Body:** None  
+  - **Headers:** None  
+
+</details>
+
 
 ----
 
