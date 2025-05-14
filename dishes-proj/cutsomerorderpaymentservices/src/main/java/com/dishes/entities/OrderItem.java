@@ -11,6 +11,15 @@ public class OrderItem {
 
     private Long productId;
     private String productName;
+    private String productImageUrl;
+    public String getProductImageUrl() {
+        return productImageUrl;
+    }
+
+    public void setProductImageUrl(String productImageUrl) {
+        this.productImageUrl = productImageUrl;
+    }
+
     private int quantity;
     private double price;
     private Long sellerId;

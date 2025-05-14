@@ -76,6 +76,7 @@ public class OrderEventListener {
                     SoldProduct soldProduct = new SoldProduct();
                     soldProduct.setProductId(oi.getProductId());
                     soldProduct.setProductName(product.getName());
+                    soldProduct.setImageUrl(product.getImageUrl());
                     soldProduct.setCustomerName(event.getCustomerName());
                     soldProduct.setCustomerEmail(event.getCustomerEmail());
                     soldProduct.setShippingCompany(event.getShippingCompany());

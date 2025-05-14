@@ -125,6 +125,7 @@ public class OrderService {
                 item.setQuantity(itemDto.getQuantity());
                 item.setSellerId(itemDto.getSellerId());
                 item.setProductName(itemDto.getProductName());
+                item.setProductImageUrl(itemDto.getProductImageUrl());;
                 item.setOrder(order);
                 item.setPrice(itemDto.getPrice());
                 order.addItem(item);
@@ -192,6 +193,7 @@ public class OrderService {
                     OrderItemEvent itemEvent = new OrderItemEvent();
                     itemEvent.setProductId(item.getProductId());
                     itemEvent.setProductName(item.getProductName());
+                    itemEvent.setProductImageUrl(item.getProductImageUrl());
                     itemEvent.setPrice(item.getPrice());
                     itemEvent.setQuantity(item.getQuantity());
                     itemEvent.setSellerId(item.getSellerId());
@@ -348,6 +350,7 @@ public class OrderService {
                     OrderItem itemDTO = new OrderItem();
                     itemDTO.setProductId(item.getProductId());
                     itemDTO.setProductName(item.getProductName());
+                    itemDTO.setProductImageUrl(item.getProductImageUrl());
                     itemDTO.setQuantity(item.getQuantity());
                     itemDTO.setPrice(item.getPrice());
                     itemDTO.setSellerId(item.getSellerId());

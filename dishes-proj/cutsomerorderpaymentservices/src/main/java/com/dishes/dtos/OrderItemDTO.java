@@ -3,9 +3,16 @@ package com.dishes.dtos;
 public class OrderItemDTO {
     private Long productId;
     private String productName;
+    private String productImageUrl;
     private Long sellerId;
     private double price;
     private int quantity;
+    public String getProductImageUrl() {
+        return productImageUrl;
+    }
+    public void setProductImageUrl(String productImageUrl) {
+        this.productImageUrl = productImageUrl;
+    }
     public String getProductName() {
         return productName;
     }

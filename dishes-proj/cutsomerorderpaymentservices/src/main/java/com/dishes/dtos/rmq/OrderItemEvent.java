@@ -5,6 +5,13 @@ public class OrderItemEvent{
     private Long productId;
     private Long sellerId;
     private String productName;
+    private String productImageUrl;
+    public String getProductImageUrl() {
+        return productImageUrl;
+    }
+    public void setProductImageUrl(String productImageUrl) {
+        this.productImageUrl = productImageUrl;
+    }
     private double price;
     private int quantity;
     
