@@ -120,6 +120,19 @@ public class ProductService {
     }
 
 
+    public List<ProductResponse> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(this::mapToProductResponse)
+                .toList();
+    }
+
+    public List<ProductResponse> getAllAvailableProducts() {
+        return productRepository.findByStatus(ProductStatus.AVAILABLE).stream()
+                .map(this::mapToProductResponse)
+                .toList();
+    }
+
+
     private ProductResponse mapToProductResponse(Product product) {
         ProductResponse response = new ProductResponse();
         response.setId(product.getId());
@@ -127,6 +140,7 @@ public class ProductService {
         response.setAmount(product.getAmount());
         response.setPrice(product.getPrice());
         response.setStatus(product.getStatus().name());
+        response.setSellerId(product.getSeller().getId());
         response.setImageUrl(product.getImageUrl());
         return response;
     }

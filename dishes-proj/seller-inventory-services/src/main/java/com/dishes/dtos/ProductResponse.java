@@ -7,6 +7,15 @@ public class ProductResponse {
     private double price;
     private String status;
     private String imageUrl;
+    private Long sellerId;
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
+    }
 
     public String getImageUrl() {
         return imageUrl;
