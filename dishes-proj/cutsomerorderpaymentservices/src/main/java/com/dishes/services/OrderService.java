@@ -14,6 +14,7 @@ import javax.naming.ServiceUnavailableException;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import com.dishes.dtos.rmq.OrderPlacedEvent;
 import com.dishes.entities.Order;
 import com.dishes.entities.OrderItem;
 import com.dishes.entities.ShippingCompany;
+import com.dishes.jwt.JwtTokenUtil;
 import com.dishes.repositories.CustomerRepository;
 import com.dishes.repositories.OrderRepository;
 import com.dishes.repositories.ShippingCompanyRepository;
@@ -56,6 +58,8 @@ public class OrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
+    @Autowired
+    private JwtTokenUtil token;
 
     private final CircuitBreaker circuitBreaker;
     public OrderService(ShippingCompanyRepository shippingCompanyRepository, 
@@ -98,7 +102,7 @@ public class OrderService {
 
     @Transactional(rollbackOn = Exception.class)
     public CompletableFuture<OrderResponse> addOrder(AddOrderDTO request, String authHeader) throws ServiceUnavailableException {
-
+        Long customerId=token.extractCustomerId(authHeader.substring(7));
         CompletableFuture<OrderResponse> responseFuture=new CompletableFuture<>();
         if(!isSellerServiceAvailable()){
             OrderResponse response = new OrderResponse();
@@ -110,7 +114,7 @@ public class OrderService {
         }
 
         Order order = new Order();
-        order.setCustomer(customerRepository.findById(request.getCustomerId()).orElseThrow());
+        order.setCustomer(customerRepository.findById(customerId).orElseThrow());
         order.setStatus(Order.OrderStatus.Pending);
         
 
