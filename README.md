@@ -292,6 +292,22 @@ mvn spring-boot:run
 
 </details>
 
+
+<details>
+<summary>🔹 Get a customer's orders </summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8081/api/customers/customer-orders`
+- **Request Body:** None
+- **Headers:**   
+  > ```
+  > Authorization: Bearer <your-jwt-token-returned-from-login-endpoint>
+  > Content-Type: application/json
+  > ```
+
+</details>
+
+
 ----
 
 
