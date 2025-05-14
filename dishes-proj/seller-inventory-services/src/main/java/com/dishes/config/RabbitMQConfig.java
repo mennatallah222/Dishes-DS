@@ -1,6 +1,10 @@
 package com.dishes.config;
 
+import org.springframework.amqp.core.Binding;
+
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +27,19 @@ public class RabbitMQConfig {
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public TopicExchange ordersExchange() {
+        return new TopicExchange("orders.exchange");
+    }
+
+    @Bean
+    public Binding rollbackBinding(Queue rollbackQueue, TopicExchange ordersExchange) {
+        return BindingBuilder
+                .bind(rollbackQueue)
+                .to(ordersExchange)
+                .with("order.rollback");
     }
 
 }

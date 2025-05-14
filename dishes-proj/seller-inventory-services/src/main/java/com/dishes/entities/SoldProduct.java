@@ -21,13 +21,20 @@ public class SoldProduct {
     private String customerName;
     private String customerEmail;
     private String shippingCompany;
-
+    
     private String imageUrl;
+    
+    public Long getOrderId() {
+        return orderId;
+    }
 
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
     public String getImageUrl() {
         return imageUrl;
     }
-
+    
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }

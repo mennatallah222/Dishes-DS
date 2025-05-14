@@ -28,7 +28,7 @@ public class OrderEventListener {
     private final ProductRepository productRepository;
     private final RabbitTemplate rabbitTemplate;
 
-    private static final Logger log = LoggerFactory.getLogger(OrderRollbackEvent.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderEventListener.class);
 
     public OrderEventListener(SoldProductRepository soldProductRepository, 
                             ProductRepository productRepository,
@@ -79,6 +79,7 @@ public class OrderEventListener {
                     soldProduct.setCustomerName(event.getCustomerName());
                     soldProduct.setCustomerEmail(event.getCustomerEmail());
                     soldProduct.setShippingCompany(event.getShippingCompany());
+                    soldProduct.setOrderId(event.getOrderId());
                     soldProduct.setPrice(oi.getPrice());
                     soldProduct.setQuantity(oi.getQuantity());
                     soldProduct.setSellerId(oi.getSellerId());
@@ -125,22 +126,29 @@ public class OrderEventListener {
     @RabbitListener(queues = "seller.orders.rollback.queue")
     public void handleOrderRollback(OrderRollbackEvent event) {
         log.info("Processing rollback for order {}", event.getOrderId());
-        
-        for (OrderItemEvent item : event.getItems()) {
-            Product product = productRepository.findById(item.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found: " + item.getProductId()));
+        try{
+            for (OrderItemEvent item : event.getItems()) {
+                Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found: " + item.getProductId()));
 
-            product.setAmount(product.getAmount() + item.getQuantity());
-            if (product.getStatus() == Product.ProductStatus.SOLD_OUT) {
-                product.setStatus(Product.ProductStatus.AVAILABLE);
+                product.setAmount(product.getAmount() + item.getQuantity());
+                if (product.getStatus() == Product.ProductStatus.SOLD_OUT) {
+                    product.setStatus(Product.ProductStatus.AVAILABLE);
+                }
+                productRepository.save(product);
             }
-            productRepository.save(product);
+            log.info("Deleting sold products for orderId={}", event.getOrderId());
+            int deleted = soldProductRepository.deleteByOrderId(event.getOrderId());
+            log.info("Deleted {} sold products", deleted);
 
-            soldProductRepository.deleteByProductIdAndOrderId(
-                item.getProductId(),
-                event.getOrderId()
-            );
+            soldProductRepository.deleteByOrderId(event.getOrderId());
+            productRepository.flush();
+            soldProductRepository.flush();
+
+        }
+        catch (Exception e){
+            log.error("Failed to process rollback for order {}", event.getOrderId(), e);
+            throw e;
         }
     }
-    
 }

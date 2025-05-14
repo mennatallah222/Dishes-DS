@@ -224,10 +224,10 @@ public class OrderService {
             if(response.isSuccess()) {
                 order.setStatus(Order.OrderStatus.Completed);
                 orderResponse.setStatus("COMPLETED");
-                orderResponse.setMessage("Order is completed successfully! Items reserved, proceed to checkout");
+                orderResponse.setMessage("Order is completed successfully! Items are reserved, proceed to checkout");
                 orderRepository.saveAndFlush(order);
             }
-            else{   //rollback the order actions
+            else{
                 order.setStatus(Order.OrderStatus.Failed);
                 System.out.println("Order failed: " + response.getMessage());
                 orderResponse.setStatus("PENDING");
@@ -239,7 +239,7 @@ public class OrderService {
             
             
             resFuture.complete(orderResponse);
-            sendOrderNotification(order.getCustomer().getId(), orderResponse);
+            // sendOrderNotification(order.getCustomer().getId(), orderResponse);
         }
 
     }
@@ -266,7 +266,7 @@ public class OrderService {
                 response.setMessage("Order confirmed successfully");
             }
             else{
-                rollbackOrder(order);
+                orderRollbackEvent(order);
                 order.setStatus(Order.OrderStatus.Failed);
                 response.setStatus("FAILED");
                 response.setMessage(String.format(
@@ -281,7 +281,7 @@ public class OrderService {
             return response;
         }
         catch (Exception e) {
-            rollbackOrder(order);
+            orderRollbackEvent(order);
             order.setStatus(Order.OrderStatus.Failed);
             orderRepository.save(order);
             throw new RuntimeException("Checkout processing failed", e);
@@ -307,11 +307,11 @@ public class OrderService {
         }
     }
 
-    private void rollbackOrder(Order order) {
+    private void orderRollbackEvent(Order order) {
         try {
-            OrderRollbackEvent rollbackEvent = new OrderRollbackEvent();
-            rollbackEvent.setOrderId(order.getId());
-            rollbackEvent.setItems(order.getItems().stream()
+            OrderRollbackEvent event=new OrderRollbackEvent();
+            event.setOrderId(order.getId());
+            event.setItems(order.getItems().stream()
                 .map(item -> {
                     OrderItemEvent itemEvent = new OrderItemEvent();
                     itemEvent.setProductId(item.getProductId());
@@ -323,18 +323,12 @@ public class OrderService {
             rabbitTemplate.convertAndSend(
                 RabbitMQConfig.ORDERS_EXCHANGE, 
                 "order.rollback", 
-                rollbackEvent
+                event
             );
         }
         catch (Exception e) {
             log.error("Failed to send rollback request for order {}", order.getId(), e);
         }
-    }
-
-
-    private void sendOrderNotification(Long customerId, OrderResponse response) {
-        //notification logic using websocket
-        //RabbitMQ to send to Notification Service?
     }
 
     private OrderResponse convertToResponse(Order order) {

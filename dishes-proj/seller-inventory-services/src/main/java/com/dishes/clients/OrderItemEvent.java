@@ -8,6 +8,15 @@ public class OrderItemEvent {
     private double price;
     private int quantity;
     private String imageUrl;
+    private Long orderId;
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
 
     public String getImageUrl() {
         return imageUrl;
