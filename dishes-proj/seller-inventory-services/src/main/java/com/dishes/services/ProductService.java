@@ -78,31 +78,33 @@ public class ProductService {
     }
 
     public ProductResponse updateDish(Long dishId, UpdateProductRequest request, String authHeader) {
-        Long sellerId = token.extractSellerId(authHeader.substring(7));
-        Product existingDish = productRepository.findByIdAndSellerId(dishId, sellerId)
-                .orElse(null);
-        
-        if (existingDish == null) {
-            return null;
-        }        
-        boolean nameExists = productRepository.existsByNameAndSellerAndIdNot(
-                request.getName(), 
-                existingDish.getSeller(), 
-                dishId);
-        
-        if (nameExists) {
-            return null;
-        }
-        
-        existingDish.setName(request.getName());
-        existingDish.setAmount(request.getAmount());
-        existingDish.setPrice(request.getPrice());
-        existingDish.setStatus(request.getAmount() > 0 ? 
-                ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
-        
-        Product updatedProduct = productRepository.save(existingDish);
-        return mapToProductResponse(updatedProduct);
+    Long sellerId = token.extractSellerId(authHeader.substring(7));
+    Product existingDish = productRepository.findByIdAndSellerId(dishId, sellerId)
+            .orElse(null);
+    
+    if (existingDish == null) {
+        return null;
+    }        
+    
+    boolean nameExists = productRepository.existsByNameAndSellerAndIdNot(
+            request.getName(), 
+            existingDish.getSeller(), 
+            dishId);
+    
+    if (nameExists) {
+        return null;
     }
+    
+    existingDish.setName(request.getName());
+    existingDish.setAmount(request.getAmount());
+    existingDish.setPrice(request.getPrice());
+    existingDish.setImageUrl(request.getImageUrl()); 
+    existingDish.setStatus(
+        request.getAmount() > 0 ? ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
+    
+    Product updatedProduct = productRepository.save(existingDish);
+    return mapToProductResponse(updatedProduct);
+}
 
 
     private ProductSoldResponse mapToSoldResponse(SoldProduct item) {
