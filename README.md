@@ -97,6 +97,41 @@ standalone.bat
 ---
 
 <details>
+  <summary><em>for jms in java ee:</em></summary>
+  
+  go to: C:\Users\wildfly-36.0.0.Final\wildfly-36.0.0.Final\standalone\configuration\standalone.xml
+  
+  put this:    
+
+  ```bash
+      <default-resource-adapter-name>activemq-ra</default-resource-adapter-name>
+  ```
+
+> inside this section:
+
+```bash
+  <subsystem xmlns="urn:jboss:domain:ejb3:10.0">
+```
+***then this, under <em><profile></em>  section:***
+
+  ```bash
+      <subsystem xmlns="urn:jboss:domain:messaging-activemq:7.0">
+          <server name="default">
+              <jms-destinations>
+                  <jms-queue name="PaymentFailedQueue">
+                      <entry name="jms/PaymentFailedQueue"/>
+                  </jms-queue>
+              </jms-destinations>
+
+          </server>
+      </subsystem>
+```
+
+</details>
+
+---
+
+<details>
   <summary>
     📌 <em>To allow CORS in the Java EE service</em> <code>admin-service</code> :
   </summary>
