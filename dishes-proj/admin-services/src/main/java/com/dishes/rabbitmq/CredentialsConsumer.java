@@ -4,6 +4,10 @@ import com.rabbitmq.client.*;
 import com.dishes.dto.CredentialsMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.ejb.Singleton;
+import jakarta.ejb.Startup;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -18,43 +22,70 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-public class RabbitMQConsumer {
+@Startup
+@Singleton
+public class CredentialsConsumer {
 
     private static final String EXCHANGE_NAME = "credentials_exchange";
     private static final String ROUTING_KEY = "company.credentials";
     private static final String QUEUE_NAME = "credentials_queue";
 
-    public static void main(String[] args) throws Exception {
+    private Connection connection;
+    private Channel channel;
+
+    @PostConstruct
+    public void init() {
+        new Thread(() -> {
+            try {
+                startConsumer();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void startConsumer() throws Exception {
         com.rabbitmq.client.ConnectionFactory factory = new com.rabbitmq.client.ConnectionFactory();
         factory.setHost("localhost");
         factory.setUsername("guest");
         factory.setPassword("guest");
 
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
+        connection = factory.newConnection();
+        channel = connection.createChannel();
 
-            channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
-            channel.queueDeclare(QUEUE_NAME, true, false, false, null);
-            channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
+        channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
+        channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
 
-            System.out.println("Waiting for credential messages...");
+        System.out.println("Waiting for credential messages...");
 
-            DeliverCallback deliverCallback = (_, delivery) -> {
-                String json = new String(delivery.getBody(), StandardCharsets.UTF_8);
-                System.out.println("Received credentials: " + json);
+        DeliverCallback deliverCallback = (_, delivery) -> {
+            String json = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            System.out.println("Received credentials: " + json);
 
-                ObjectMapper mapper = new ObjectMapper();
-                CredentialsMessage msg = mapper.readValue(json, CredentialsMessage.class);
-                sendEmail(msg.getEmail(), msg.getCompanyName(), msg.getPassword());
-            };
-            channel.basicConsume(QUEUE_NAME, true, deliverCallback, _ -> {});
-            Thread.sleep(Long.MAX_VALUE);
+            ObjectMapper mapper = new ObjectMapper();
+            CredentialsMessage msg = mapper.readValue(json, CredentialsMessage.class);
+            sendEmail(msg.getEmail(), msg.getCompanyName(), msg.getPassword());
+        };
+        channel.basicConsume(QUEUE_NAME, true, deliverCallback, _ -> {});
+        
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        try {
+            if (channel != null && channel.isOpen()) channel.close();
+            if (connection != null && connection.isOpen()) connection.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private static void sendEmail(String to, String companyName, String password) {
         Properties emailProps = new Properties();
-        try (InputStream input =RabbitMQConsumer.class.getClassLoader().getResourceAsStream("email.properties")) {
+        try (InputStream input =CredentialsConsumer.class.getClassLoader().getResourceAsStream("email.properties")) {
             if (input == null) {
                 System.err.println("email.properties not found in classpath!");
                 return;
@@ -84,8 +115,8 @@ public class RabbitMQConsumer {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject("Company Account Credentials");
-            message.setText("Dear " +to+ ", \nYour company account credentials are: \n Your username: "+ companyName + "\n\nYour password is: " + password);
+            message.setSubject("Your company representitive account credentials :) ");
+            message.setText("Dear " +to+ ", \nYour company account credentials are these now: \n Your username: "+ companyName + "\nYour password is: " + password+"\n\n you can login directly using them!!");
 
             Transport.send(message);
             System.out.println("Email sent to " + to);
