@@ -39,7 +39,7 @@ public class OrderController {
     @PostMapping("/checkout/{orderId}")
     public ResponseEntity<OrderResponse> checkoutOrder(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long orderId) throws ServiceUnavailableException {
+            @PathVariable("orderId") Long orderId) throws ServiceUnavailableException {
         OrderResponse or = orderService.checkoutOrder(orderId);
         if ("CONFIRMED".equals(or.getStatus())){
             return ResponseEntity.ok(or);

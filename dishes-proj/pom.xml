@@ -13,6 +13,7 @@
     <module>admin-services</module>
     <module>cutsomerorderpaymentservices</module>
     <module>seller-inventory-services</module>
+    <module>apigateway</module>
 
   </modules>
   <name>dishes-proj</name>

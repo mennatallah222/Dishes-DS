@@ -21,6 +21,12 @@ public class RabbitMQConfig {
     public static final String SELLER_ORDERS_QUEUE = "seller.orders.queue";
     public static final String ORDER_RESPONSES_QUEUE = "order.responses.queue";
 
+
+    @Bean
+    public DirectExchange orderFailureExchange() {
+        return new DirectExchange("order.failure.exchange");
+    }
+    
     @Bean
     public TopicExchange ordersExchange() {
         return new TopicExchange(ORDERS_EXCHANGE);

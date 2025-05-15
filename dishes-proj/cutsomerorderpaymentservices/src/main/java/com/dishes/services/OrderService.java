@@ -1,5 +1,6 @@
 package com.dishes.services;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dishes.config.RabbitMQConfig;
@@ -26,6 +26,7 @@ import com.dishes.dtos.AddOrderDTO;
 import com.dishes.dtos.OrderProcessedResponse;
 import com.dishes.dtos.OrderResponse;
 import com.dishes.dtos.OrderRollbackEvent;
+import com.dishes.dtos.events.OrderFailedEvent;
 import com.dishes.dtos.rmq.OrderItemEvent;
 import com.dishes.dtos.rmq.OrderPlacedEvent;
 import com.dishes.entities.Order;
@@ -104,7 +105,7 @@ public class OrderService {
     public CompletableFuture<OrderResponse> addOrder(AddOrderDTO request, String authHeader) throws ServiceUnavailableException {
         Long customerId=token.extractCustomerId(authHeader.substring(7));
         CompletableFuture<OrderResponse> responseFuture=new CompletableFuture<>();
-        if(!isSellerServiceAvailable()){
+        if(!checkSellerServiceHealth()){
             OrderResponse response = new OrderResponse();
             response.setStatus("FAILED");
             response.setErrorMessage("Seller service is currently unavailable!😔");
@@ -202,16 +203,6 @@ public class OrderService {
                 .toList());
         return event;
     }
-    private boolean isSellerServiceAvailable() {
-        try {
-            restTemplate.getForEntity(sellerServiceURL, String.class);
-            return true;
-        }
-        catch (ResourceAccessException e) {
-            return false;
-        }
-    }
-    
     
     @RabbitListener(queues = RabbitMQConfig.ORDER_RESPONSES_QUEUE)
     @Transactional
@@ -243,8 +234,6 @@ public class OrderService {
                 orderResponse.setErrorCode(response.getFailReason());
                 orderRepository.saveAndFlush(order);
             }
-            
-            
             resFuture.complete(orderResponse);
             // sendOrderNotification(order.getCustomer().getId(), orderResponse);
         }
@@ -282,6 +271,8 @@ public class OrderService {
                     minCharge
                 ));
                 response.setErrorCode("MIN_CHARGE_NOT_MET");
+                handleOrderFailure(order.getId(), order.getCustomer().getId(), "Minimum charge not met: " + order.getTotal() + " < " + minCharge);
+
             }
             
             orderRepository.save(order);
@@ -291,6 +282,7 @@ public class OrderService {
             orderRollbackEvent(order);
             order.setStatus(Order.OrderStatus.Failed);
             orderRepository.save(order);
+            handleOrderFailure(order.getId(), order.getCustomer().getId(), "Checkout processing failed: " + e.getMessage());
             throw new RuntimeException("Checkout processing failed", e);
         }
     }
@@ -359,6 +351,21 @@ public class OrderService {
                 .toList()
         );
         return response;
+    }
+
+
+    private void handleOrderFailure(Long orderId, Long customerId, String reason) {
+        OrderFailedEvent event = new OrderFailedEvent();
+        event.setOrderId(orderId);
+        event.setCustomerId(customerId);
+        event.setTotalAmount(orderRepository.getById(orderId).getTotal());
+        event.setFailureReason(reason);
+        event.setTimestamp(LocalDateTime.now());;
+        rabbitTemplate.convertAndSend(
+            "order.failure.exchange",
+            "PaymentFailed",
+            event
+        );
     }
 
 }

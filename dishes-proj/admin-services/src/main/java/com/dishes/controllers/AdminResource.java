@@ -19,6 +19,7 @@ import com.dishes.dtos.SellerResponse;
 import com.dishes.entities.Admin;
 import com.dishes.services.AdminServiceBean;
 import com.dishes.services.CustomerServiceBean;
+import com.dishes.services.OrderFailureService;
 import com.dishes.startup.AdminInitializer;
 
 @Path("/admin")
@@ -33,6 +34,9 @@ public class AdminResource {
 
     @Inject
     private AdminInitializer adminInitializer;
+
+    @Inject
+    private OrderFailureService orderFailureService;
 
     @OPTIONS
     @Path("/login")
@@ -104,8 +108,6 @@ public class AdminResource {
         return Response.ok(adminInitializer.getMinimumOrderCharge()).build();
     }
 
-    //to change the min charge: put request
-
     @POST
     @Path("/min-order-charge")
     public Response setMinimumOrderCharge(@QueryParam("charge") BigDecimal newCharge) {
@@ -117,4 +119,12 @@ public class AdminResource {
         adminInitializer.setMinimumOrderCharge(newCharge);
         return Response.ok().entity("Minimum charge updated to: " + newCharge).build();
     }
+
+    @GET
+    @Path("/order-failures")
+    // @RolesAllowed("ADMIN")
+    public Response getFailures() {
+        return Response.ok(orderFailureService.getAllFailures()).build();
+    }
+
 }

@@ -23,6 +23,7 @@ com\dishes\dtos\rmq\OrderItemEvent.class
 com\dishes\repositories\ShippingCompanyRepository.class
 com\dishes\controllers\CustomerController.class
 com\dishes\dtos\AddOrderDTO.class
+com\dishes\dtos\events\OrderFailedEvent.class
 com\dishes\dtos\OrderItemDTO.class
 com\dishes\services\OrderService.class
 com\dishes\dtos\OrderItemResponse.class
