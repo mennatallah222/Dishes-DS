@@ -37,17 +37,16 @@ public class OrderController {
     }
 
     @PostMapping("/checkout/{orderId}")
-    public ResponseEntity<OrderResponse> checkoutOrder(
-            @RequestHeader("Authorization") String authHeader,
-            @PathVariable("orderId") Long orderId) throws ServiceUnavailableException {
-        OrderResponse or = orderService.checkoutOrder(orderId);
-        if ("CONFIRMED".equals(or.getStatus())){
-            return ResponseEntity.ok(or);
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(or);
-        }
+public ResponseEntity<OrderResponse> checkoutOrder(
+        @RequestHeader("Authorization") String authHeader,
+        @PathVariable("orderId") Long orderId) throws ServiceUnavailableException {
+
+    OrderResponse or = orderService.checkoutOrder(orderId);
+
+    if ("CONFIRMED".equals(or.getStatus())) {
+        return ResponseEntity.ok(or);
+    } else {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(or);
     }
-
-
+}
 }
