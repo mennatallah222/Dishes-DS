@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.dishes.dtos.CompanyCreationResult;
-import com.dishes.dtos.CompanyDTO;
-import com.dishes.dtos.CredentialsMessage;
-import com.dishes.dtos.SellerResponse;
-import com.dishes.dtos.UserDTO;
+import com.dishes.dto.CompanyCreationResult;
+import com.dishes.dto.CompanyDTO;
+import com.dishes.dto.CredentialsMessage;
+import com.dishes.dto.SellerResponse;
+import com.dishes.dto.UserDTO;
 import com.dishes.entities.*;
 import com.dishes.jwt.JwtUtil;
 import com.dishes.rabbitmq.RabbitMQProducer;

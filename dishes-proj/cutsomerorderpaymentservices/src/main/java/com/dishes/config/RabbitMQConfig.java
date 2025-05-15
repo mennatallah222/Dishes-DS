@@ -16,15 +16,22 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 @Configuration
 public class RabbitMQConfig {
 
-    // Define exchange names
     public static final String ORDERS_EXCHANGE = "orders.exchange";
     public static final String SELLER_ORDERS_QUEUE = "seller.orders.queue";
     public static final String ORDER_RESPONSES_QUEUE = "order.responses.queue";
 
 
     @Bean
-    public DirectExchange orderFailureExchange() {
-        return new DirectExchange("order.failure.exchange");
+    public DirectExchange paymentFailedExchange() {
+        return new DirectExchange("PaymentFailed");
+    }
+    @Bean
+    public Queue paymentFailedQueue(){
+        return new Queue("payment.failed.queue", true);
+    }
+    @Bean
+    public Binding paymentFailedBinding(@Qualifier("paymentFailedQueue")Queue q, @Qualifier ("paymentFailedExchange")DirectExchange e){
+        return BindingBuilder.bind(q).to(e).with("PaymentFailed");
     }
     
     @Bean

@@ -1,4 +1,4 @@
-package com.dishes.dtos;
+package com.dishes.dto;
 import java.util.List;
 
 public class CompanyCreationResult {

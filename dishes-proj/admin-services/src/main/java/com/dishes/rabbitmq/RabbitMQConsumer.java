@@ -1,8 +1,7 @@
 package com.dishes.rabbitmq;
 
 import com.rabbitmq.client.*;
-
-import com.dishes.dtos.CredentialsMessage;
+import com.dishes.dto.CredentialsMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.mail.Authenticator;

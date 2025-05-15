@@ -3,7 +3,7 @@ package com.dishes.services;
 import java.util.List;
 
 import com.dishes.clients.CustomerServiceClient;
-import com.dishes.dtos.UserDTO;
+import com.dishes.dto.UserDTO;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

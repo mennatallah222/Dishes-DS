@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
 
-import com.dishes.dtos.UserDTO;
+import com.dishes.dto.UserDTO;
 
 @ApplicationScoped
 public class CustomerServiceClient {

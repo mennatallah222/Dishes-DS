@@ -11,10 +11,10 @@
         <!--listing our entity classes -->
         <class>com.dishes.entities.Admin</class>
         <class>com.dishes.entities.CompanyRep</class>
-        <class>com.dishes.entity.OrderFailure</class>
+        <class>com.dishes.entities.OrderFailure</class>
         
         <properties>
-            <!-- Use create-only for initial setup -->
+            <!-- create-only for initial setup -->
             <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
             
             <!-- Hibernate properties -->

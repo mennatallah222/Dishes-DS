@@ -361,11 +361,7 @@ public class OrderService {
         event.setTotalAmount(orderRepository.getById(orderId).getTotal());
         event.setFailureReason(reason);
         event.setTimestamp(LocalDateTime.now());;
-        rabbitTemplate.convertAndSend(
-            "order.failure.exchange",
-            "PaymentFailed",
-            event
-        );
+        rabbitTemplate.convertAndSend("PaymentFailed", "PaymentFailed", event);
     }
 
 }

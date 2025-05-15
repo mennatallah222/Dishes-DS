@@ -1,4 +1,4 @@
-package com.dishes.dtos;
+package com.dishes.dto;
 
 public class SellerResponse {
     private String token;

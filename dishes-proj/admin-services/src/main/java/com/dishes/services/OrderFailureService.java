@@ -2,26 +2,10 @@ package com.dishes.services;
 
 import java.util.List;
 
+import com.dishes.dto.OrderFailedEvent;
 import com.dishes.entities.OrderFailure;
 
-import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
-@Stateless
-public class OrderFailureService {
-
-    @PersistenceContext
-    private EntityManager em;
-
-    // Save a new failure event
-    public void saveFailure(OrderFailure failure) {
-        em.persist(failure);
-    }
-
-    // Get all failures
-    public List<OrderFailure> getAllFailures() {
-        return em.createQuery("SELECT f FROM OrderFailure f ORDER BY f.timestamp DESC", OrderFailure.class)
-                 .getResultList();
-    }
+public interface OrderFailureService {
+    void saveFailure(OrderFailedEvent event);
+    List<OrderFailure> getAllFailures();
 }

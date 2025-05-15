@@ -1,5 +1,0 @@
-com\dishes\client\AdminServiceClient.class
-com\dishes\config\RabbitMQConfig.class
-com\dishes\service\OrderFailureHandler.class
-com\dishes\dto\OrderFailedEvent.class
-com\dishes\Main.class

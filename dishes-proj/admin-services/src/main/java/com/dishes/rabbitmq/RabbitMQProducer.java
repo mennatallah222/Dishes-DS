@@ -4,8 +4,9 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import jakarta.enterprise.context.ApplicationScoped;
-import com.dishes.dtos.CredentialsMessage;
-import com.dishes.dtos.events.OrderFailedEvent;
+
+import com.dishes.dto.CredentialsMessage;
+import com.dishes.dto.OrderFailedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped

@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dishes.dtos.CompanyCreationResult;
-import com.dishes.dtos.CompanyDTO;
-import com.dishes.dtos.SellerLoginRequest;
-import com.dishes.dtos.SellerResponse;
+import com.dishes.dto.CompanyCreationResult;
+import com.dishes.dto.CompanyDTO;
+import com.dishes.dto.SellerLoginRequest;
+import com.dishes.dto.SellerResponse;
 import com.dishes.entities.Admin;
 import com.dishes.services.AdminServiceBean;
 import com.dishes.services.CustomerServiceBean;
@@ -102,22 +102,19 @@ public class AdminResource {
         return Response.ok(seller).build();
     }
 
-    @GET
-    @Path("/min-order-charge")
-    public Response getMinimumOrderCharge() {
-        return Response.ok(adminInitializer.getMinimumOrderCharge()).build();
+    @POST
+    @Path("/update-minimum-charge")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateMinimumCharge(BigDecimal newCharge) {
+        adminInitializer.setMinimumOrderCharge(newCharge);
+        return Response.ok().build();
     }
 
-    @POST
-    @Path("/min-order-charge")
-    public Response setMinimumOrderCharge(@QueryParam("charge") BigDecimal newCharge) {
-        if (newCharge.compareTo(BigDecimal.ZERO) < 0) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                   .entity("Minimum charge cannot be negative")
-                   .build();
-        }
-        adminInitializer.setMinimumOrderCharge(newCharge);
-        return Response.ok().entity("Minimum charge updated to: " + newCharge).build();
+    @GET
+    @Path("/get-minimum-charge")
+    @Produces(MediaType.APPLICATION_JSON)
+    public BigDecimal getMinimumCharge() {
+        return adminInitializer.getMinimumOrderCharge();
     }
 
     @GET
