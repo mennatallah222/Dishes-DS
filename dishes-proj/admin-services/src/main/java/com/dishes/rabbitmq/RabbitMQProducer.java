@@ -5,6 +5,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import com.dishes.dtos.CredentialsMessage;
+import com.dishes.dtos.events.OrderFailedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
@@ -36,4 +37,15 @@ public class RabbitMQProducer {
             e.printStackTrace();
         }
     }
+    public void sendPaymentFailureEvent(OrderFailedEvent event) {
+    try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
+        channel.exchangeDeclare("payments_exchange", "direct", true);
+        String jsonMessage = objectMapper.writeValueAsString(event);
+        channel.basicPublish("payments_exchange", "PaymentFailed", null, jsonMessage.getBytes());
+        System.out.println("PaymentFailed event sent: " + jsonMessage);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 }

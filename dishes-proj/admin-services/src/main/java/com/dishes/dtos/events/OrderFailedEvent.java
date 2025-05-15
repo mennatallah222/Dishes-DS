@@ -58,4 +58,14 @@ public class OrderFailedEvent {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
+    private String receipt;
+
+public String getReceipt() {
+    return receipt;
+}
+
+public void setReceipt(String receipt) {
+    this.receipt = receipt;
+}
+
 }

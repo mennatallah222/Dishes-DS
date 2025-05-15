@@ -51,5 +51,15 @@ public class OrderFailure {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
-    
+    @Column(length = 1000)
+private String receipt;
+
+public String getReceipt() {
+    return receipt;
+}
+
+public void setReceipt(String receipt) {
+    this.receipt = receipt;
+}
+
 }

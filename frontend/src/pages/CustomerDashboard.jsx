@@ -95,29 +95,40 @@ const CustomerDashboard = () => {
   };
 
   const handleCheckout = async () => {
-    if (!orderId) {
-      setMessage("No order to checkout");
-      return;
+  if (!orderId) {
+    setMessage("No order to checkout");
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:8081/orders/checkout/${orderId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      // Try to get error message from response JSON
+      const errorData = await res.json();
+      
+      // If the error message is about order minimum
+      if (errorData.message && errorData.message.toLowerCase().includes("minimum") || errorData.message.toLowerCase().includes("50")) {
+        throw new Error("Order should be more than 50");
+      } else {
+        throw new Error(errorData.message || "Checkout failed");
+      }
     }
 
-    try {
-      const res = await fetch(`http://localhost:8081/orders/checkout/${orderId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+    setMessage("✅ Order successfully checked out!");
+    setOrderId(null); // Reset after checkout
+  } catch (err) {
+    console.error(err);
+    setMessage(`❌ ${err.message || "Failed to checkout order."}`);
+  }
+};
 
-      if (!res.ok) throw new Error("Checkout failed");
-
-      setMessage("✅ Order successfully checked out!");
-      setOrderId(null); // Reset after checkout
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to checkout order.");
-    }
-  };
 
   const styles = {
     dashboard: {

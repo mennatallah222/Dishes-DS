@@ -10,10 +10,18 @@ import jakarta.persistence.PersistenceContext;
 
 @Stateless
 public class OrderFailureService {
+
     @PersistenceContext
     private EntityManager em;
-    
+
+    // Save a new failure event
+    public void saveFailure(OrderFailure failure) {
+        em.persist(failure);
+    }
+
+    // Get all failures
     public List<OrderFailure> getAllFailures() {
-        return em.createQuery("SELECT f FROM OrderFailure f ORDER BY f.timestamp DESC", OrderFailure.class).getResultList();
+        return em.createQuery("SELECT f FROM OrderFailure f ORDER BY f.timestamp DESC", OrderFailure.class)
+                 .getResultList();
     }
 }
