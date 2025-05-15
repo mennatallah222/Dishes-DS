@@ -415,7 +415,7 @@ mvn spring-boot:run
   <summary>🔹 Get minimum charge </summary>
   
   - **Method:** `GET`
-  - **Endpoint:** `http://localhost:8080/admin-services/api/configs/min-order-charge`
+  - **Endpoint:** `http://localhost:8080/admin-services/api/admin/get-minimum-charge`
   - **Request Body:** None  
   - **Headers:** None  
 
@@ -423,13 +423,22 @@ mvn spring-boot:run
 
 
 <details>
-  <summary>🔹 Set minimum charge </summary>
+  <summary>🔹 Update minimum charge </summary>
   
   - **Method:** `POST`
-  - **Endpoint:** `http://localhost:8081/admin/min-order-charge?charge=100`
-  - **Request Body:** None  
+  - **Endpoint:** `http://localhost:8080/admin-services/api/admin/update-minimum-charge`
+  - **Request Body:** the-new-min-charge  
   - **Headers:** None  
 
+</details>
+
+
+<details>
+  <summary>🔹 Get Order Failures</summary>
+
+- **Method:** `GET`
+- **Endpoint:** `http://localhost:8080/admin-services/api/admin/order-failures`
+- **Request Body:** None
 </details>
 
 
