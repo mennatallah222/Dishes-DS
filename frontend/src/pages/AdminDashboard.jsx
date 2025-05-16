@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 
 const AdminDashboard = () => {
     const [companies, setCompanies] = useState([]);
+    const [orderFailures, setOrderFailures] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [addCompanyResult, setAddCompanyResult] = useState('');
-    const [newCompanies, setNewCompanies] = useState([
-        { email: '', companyName: '' }
-    ]);
+    const [newCompanies, setNewCompanies] = useState([{ email: '', companyName: '' }]);
     const [activeTab, setActiveTab] = useState('addCompanies');
 
     const handleGetCompanies = async () => {
@@ -66,6 +65,17 @@ const AdminDashboard = () => {
             setNewCompanies(updated);
         }
     };
+    const handleGetOrderFailures = async () => {
+        try {
+            const res = await fetch('http://localhost:8080/admin-services/api/admin/order-failures');
+            if (!res.ok) throw new Error('Failed to fetch order failures');
+            const data = await res.json();
+            setOrderFailures(data);
+            setActiveTab('viewOrderFailures');
+        } catch (err) {
+            console.error('Error fetching order failures:', err);
+        }
+    };
 
     return (
         <div className="admin-dashboard" style={{
@@ -74,8 +84,8 @@ const AdminDashboard = () => {
             backgroundColor: 'var(--background-color)',
             fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif' ",
             display: 'flex',
-            justifyContent: 'center', 
-            alignItems: 'center', 
+            justifyContent: 'center',
+            alignItems: 'center',
             position: 'fixed',
             top: 0,
             left: 0,
@@ -119,7 +129,7 @@ const AdminDashboard = () => {
                     <div style={{
                         width: '36px',
                         height: '36px',
-                        backgroundColor: '#FF7C71', 
+                        backgroundColor: '#FF7C71',
                         color: 'white',
                         borderRadius: '50%',
                         display: 'flex',
@@ -216,7 +226,33 @@ const AdminDashboard = () => {
                                     <span>👤</span> View Customers
                                 </button>
                             </li>
+                            <li style={{ marginBottom: '0.5rem' }}>
+                                <button
+                                    onClick={() => {
+                                        handleGetOrderFailures();
+                                        setActiveTab('viewOrderFailures');
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        padding: '0.75rem 1.5rem',
+                                        border: 'none',
+                                        backgroundColor: activeTab === 'viewOrderFailures' ? '#fdecea' : 'transparent',
+                                        color: activeTab === 'viewOrderFailures' ? '#d32f2f' : '#333',
+                                        cursor: 'pointer',
+                                        fontWeight: activeTab === 'viewOrderFailures' ? '600' : '400',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    <span>❌</span> View Order Failures
+                                </button>
+                            </li>
+
                         </ul>
+
                     </nav>
 
                     <main style={{
@@ -549,15 +585,120 @@ const AdminDashboard = () => {
                                         color: '#666'
                                     }}>
                                         No customers found. Click "Refresh" to fetch customers.
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </main>
+                </div>
+            )}
+        </div>
+    )}
+
+    {activeTab === 'viewOrderFailures' && (
+    <div className="view-order-failures-section">
+        <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.5rem'
+        }}>
+            <h2 style={{
+                margin: 0,
+                fontSize: '1.4rem',
+                fontWeight: '500',
+                color: 'var(--primary-color)'
+            }}>
+                Order Failures
+            </h2>
+            <button
+                onClick={handleGetOrderFailures}
+                style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'var(--background-color)',
+                    border: 'none',
+                    color: 'var(--primary-color)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#fbe2d0'}
+                onMouseOut={(e) => e.target.style.backgroundColor = 'var(--background-color)'}
+            >
+                <span>🔄</span> Refresh
+            </button>
+        </div>
+
+        {orderFailures.length > 0 ? (
+            <div style={{
+                border: '1px solid #eee',
+                borderRadius: '8px',
+                overflow: 'hidden'
+            }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                    backgroundColor: 'var(--secondary-color)',
+                    padding: '0.75rem 1rem',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    color: 'white'
+                }}>
+                    <div>Order ID</div>
+                    <div>Customer ID</div>
+                    <div>Failure Reason</div>
+                    <div>Date</div>
+                </div>
+                {orderFailures.map((failure) => (
+                    <div
+                        key={failure.id}
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                            padding: '0.75rem 1rem',
+                            borderBottom: '1px solid #eee',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <div style={{ fontWeight: '500', color: 'var(--accent-color)' }}>{failure.orderId || 'N/A'}</div>
+                        <div>{failure.customerId || 'N/A'}</div>
+                        <div>{failure.failureReason || 'N/A'}</div>
+                        <div>
+                            {failure.timestamp ?
+                                new Date(
+                                    failure.timestamp[0], 
+                                    failure.timestamp[1] - 1, 
+                                    failure.timestamp[2], 
+                                    failure.timestamp[3], 
+                                    failure.timestamp[4], 
+                                    failure.timestamp[5] 
+                                ).toLocaleString() :
+                                'N/A'
+                            }
+                        </div>
+                    </div>
+                ))}
+            </div>
+        ) : (
+            <div style={{
+                padding: '2rem',
+                textAlign: 'center',
+                backgroundColor: 'var(--background-color)',
+                borderRadius: '8px',
+                color: '#666'
+            }}>
+                No order failures found.
+            </div>
+        )}
+    </div>
+)}
+
+</main>
                 </div>
             </div>
         </div>
     );
 };
+
+
 
 export default AdminDashboard;

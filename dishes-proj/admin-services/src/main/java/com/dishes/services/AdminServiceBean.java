@@ -89,10 +89,9 @@ public class AdminServiceBean {
 
 
     public List<UserDTO> listCompanyReps() {
-        return em.createQuery("SELECT new com.dishes.dtos.UserDTO(u.name, u.email) FROM CompanyRep u", UserDTO.class)
-                .getResultList();
-    }
-
+    return em.createQuery("SELECT new com.dishes.dto.UserDTO(u.name, u.email) FROM CompanyRep u", UserDTO.class)
+            .getResultList();
+}
     public SellerResponse authenticateSeller(String email, String companyName, String password){
         try {
             CompanyRep seller = em.createQuery(
