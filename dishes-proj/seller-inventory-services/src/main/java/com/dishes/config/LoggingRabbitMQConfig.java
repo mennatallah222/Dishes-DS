@@ -23,6 +23,6 @@ public class LoggingRabbitMQConfig {
     public Binding adminErrorBinding() {
         return BindingBuilder.bind(adminErrorQueue())
                 .to(logExchange())
-                .with("*.Error");
+                .with("*_Error");
     }
 }

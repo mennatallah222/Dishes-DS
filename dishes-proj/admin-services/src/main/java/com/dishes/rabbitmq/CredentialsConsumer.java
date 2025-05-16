@@ -85,56 +85,58 @@ public class CredentialsConsumer {
 
     private static void sendEmail(String to, String companyName, String password) {
         Properties emailProps = new Properties();
-        try (InputStream input =CredentialsConsumer.class.getClassLoader().getResourceAsStream("email.properties")) {
+        try (InputStream input = CredentialsConsumer.class.getClassLoader().getResourceAsStream("email.properties")) {
             if (input == null) {
                 System.err.println("email.properties not found in classpath!");
                 return;
             }
             emailProps.load(input);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-
+    
         final String host = emailProps.getProperty("mail.host");
-        final String from = emailProps.getProperty("Dishes.com Admin");
+        final String from = emailProps.getProperty("mail.username");
         final String username = emailProps.getProperty("mail.username");
         final String emailPassword = emailProps.getProperty("mail.password");
-
+    
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", "587");
         props.put("mail.debug", "true");
-        //creates the session and authenticates
+    
         Session session = Session.getInstance(props, new GmailAuthenticator(username, emailPassword));
-
+    
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject("Your company representitive account credentials :) ");
-            message.setText("Dear " +to+ ", \nYour company account credentials are these now: \n Your username: "+ companyName + "\nYour password is: " + password+"\n\n you can login directly using them!!");
-
+            message.setSubject("Your company representative account credentials :)");
+            message.setText("Dear " + to + ", \nYour company account credentials are:\n"
+                    + "Your username: " + companyName + "\n"
+                    + "Your password is: " + password + "\n\n"
+                    + "You can login directly using them!");
+    
             Transport.send(message);
             System.out.println("Email sent to " + to);
-
-        }
-        catch (MessagingException e) {
+    
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
+    
     static class GmailAuthenticator extends Authenticator {
         private final String username;
         private final String password;
-
+    
         public GmailAuthenticator(String username, String password) {
             this.username = username;
             this.password = password;
         }
-
+    
         @Override
         protected PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(username, password);

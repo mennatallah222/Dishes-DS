@@ -40,7 +40,7 @@ public class AuthService {
             return new AuthResponse(true, "Login succeeded", generateJwtToken(customer.get()), 3600L);
         }
         
-        loggingService.logWarning("Invalid credentials for email: " + email);
+        loggingService.logError("Invalid credentials for email: " + email);
         return new AuthResponse(false, "Invalid credentials", null, null);
     }
 

@@ -20,6 +20,7 @@ com\dishes\dto\CredentialsMessage.class
 com\dishes\entities\OrderFailure.class
 com\dishes\jwt\JwtUtil.class
 com\dishes\startup\AdminInitializer.class
+com\dishes\services\ErrorLogServiceImpl.class
 com\dishes\rabbitmq\CredentialsConsumer$GmailAuthenticator.class
 com\dishes\controllers\PreflightResource.class
 com\dishes\startup\ConsumerInitializer.class
@@ -29,6 +30,7 @@ com\dishes\configs\CORSFilter.class
 com\dishes\entities\CompanyRep.class
 com\dishes\controllers\ConfigsResource.class
 com\dishes\clients\CustomerServiceClient.class
+com\dishes\services\ErrorLogService.class
 com\dishes\rabbitmq\RabbitMQProducer.class
 com\dishes\dto\CompanyDTO.class
 com\dishes\services\CustomerServiceBean.class

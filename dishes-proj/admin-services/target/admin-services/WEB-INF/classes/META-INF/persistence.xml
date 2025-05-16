@@ -12,6 +12,7 @@
         <class>com.dishes.entities.Admin</class>
         <class>com.dishes.entities.CompanyRep</class>
         <class>com.dishes.entities.OrderFailure</class>
+        <class>com.dishes.entities.Log</class>
         
         <properties>
             <!-- create-only for initial setup -->

@@ -10,6 +10,7 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\controllers\AdminResource.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\dto\CompanyDTO.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\dto\SellerResponse.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\ErrorLogServiceImpl.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\controllers\PreflightResource.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\entities\User.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\configs\CORSFilter.java
@@ -21,6 +22,7 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\rabbitmq\PaymentFailedConsumer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\startup\ConsumerInitializer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\CustomerServiceBean.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\ErrorLogService.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\LoggingService.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\clients\CustomerServiceClient.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\controllers\ConfigsResource.java
