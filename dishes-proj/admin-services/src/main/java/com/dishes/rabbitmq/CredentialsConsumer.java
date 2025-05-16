@@ -98,7 +98,7 @@ public class CredentialsConsumer {
         }
 
         final String host = emailProps.getProperty("mail.host");
-        final String from = emailProps.getProperty("mail.username");
+        final String from = emailProps.getProperty("Dishes.com Admin");
         final String username = emailProps.getProperty("mail.username");
         final String emailPassword = emailProps.getProperty("mail.password");
 

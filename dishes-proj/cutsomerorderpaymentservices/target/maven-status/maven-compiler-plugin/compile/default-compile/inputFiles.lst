@@ -7,6 +7,7 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\OrderProcessedResponse.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\rmq\OrderItemEvent.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\entities\OrderItem.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\config\LoggingRabbitMQConfig.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\entities\Customer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\OrderItemResponse.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\repositories\ShippingCompanyRepository.java
@@ -23,6 +24,7 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\services\AuthService.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\AuthResponse.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\config\WebConfig.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\services\LoggingService.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\rmq\OrderPlacedEvent.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\controllers\Response.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\cutsomerorderpaymentservices\src\main\java\com\dishes\dtos\events\OrderFailedEvent.java

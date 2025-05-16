@@ -51,6 +51,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final OrderRepository orderRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final LoggingService loggingService;
     private final RestTemplate restTemplate;
     private final String sellerServiceURL;
 
@@ -65,7 +66,8 @@ public class OrderService {
     private final CircuitBreaker circuitBreaker;
     public OrderService(ShippingCompanyRepository shippingCompanyRepository, 
                       CustomerRepository customerRepository, 
-                      OrderRepository orderRepository, 
+                      OrderRepository orderRepository,
+                      LoggingService loggingService,
                       RabbitTemplate rabbitTemplate,
                       RestTemplate restTemplate,
                       CircuitBreakerFactory<?, ?> circuitBreakerFactory
@@ -74,6 +76,7 @@ public class OrderService {
         this.customerRepository = customerRepository;
         this.orderRepository = orderRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.loggingService=loggingService;
         this.restTemplate=restTemplate;
         this.sellerServiceURL="http://localhost:8082/seller/healthCheck";
         this.circuitBreaker=circuitBreakerFactory.create("sellerServiceCircuitBreaker");
@@ -81,6 +84,7 @@ public class OrderService {
 
     @Scheduled(fixedRate = 30000)
     public void healthCheck() {
+        loggingService.logInfo("Performing seller service health check");
         (circuitBreaker).run(
             () -> checkSellerServiceHealth(),
             throwable -> {
@@ -106,6 +110,7 @@ public class OrderService {
         Long customerId=token.extractCustomerId(authHeader.substring(7));
         CompletableFuture<OrderResponse> responseFuture=new CompletableFuture<>();
         if(!checkSellerServiceHealth()){
+            loggingService.logError("Seller service unavailable during order processing");
             OrderResponse response = new OrderResponse();
             response.setStatus("FAILED");
             response.setErrorMessage("Seller service is currently unavailable!😔");
@@ -114,72 +119,80 @@ public class OrderService {
             return responseFuture;
         }
 
-        Order order = new Order();
-        order.setCustomer(customerRepository.findById(customerId).orElseThrow());
-        order.setStatus(Order.OrderStatus.Pending);
-        
+        try{
+            Order order = new Order();
+            order.setCustomer(customerRepository.findById(customerId).orElseThrow());
+            order.setStatus(Order.OrderStatus.Pending);
+            
 
-        List<OrderItem> items = request.getItems().stream()
-            .map(itemDto -> {
-                OrderItem item = new OrderItem();
-                item.setProductId(itemDto.getProductId());
-                item.setQuantity(itemDto.getQuantity());
-                item.setSellerId(itemDto.getSellerId());
-                item.setProductName(itemDto.getProductName());
-                item.setProductImageUrl(itemDto.getProductImageUrl());;
-                item.setOrder(order);
-                item.setPrice(itemDto.getPrice());
-                order.addItem(item);
-                return item;
-            })
-            .toList();
-        
-        order.setItems(items);
-        double total=0.0;
-        List<OrderItem> oi=order.getItems();
-        for (OrderItem orderItem : oi) {
-            total+=orderItem.getPrice()*orderItem.getQuantity();
-        }
-        order.setTotal(total);
+            List<OrderItem> items = request.getItems().stream()
+                .map(itemDto -> {
+                    OrderItem item = new OrderItem();
+                    item.setProductId(itemDto.getProductId());
+                    item.setQuantity(itemDto.getQuantity());
+                    item.setSellerId(itemDto.getSellerId());
+                    item.setProductName(itemDto.getProductName());
+                    item.setProductImageUrl(itemDto.getProductImageUrl());;
+                    item.setOrder(order);
+                    item.setPrice(itemDto.getPrice());
+                    order.addItem(item);
+                    return item;
+                })
+                .toList();
+            
+            order.setItems(items);
+            double total=0.0;
+            List<OrderItem> oi=order.getItems();
+            for (OrderItem orderItem : oi) {
+                total+=orderItem.getPrice()*orderItem.getQuantity();
+            }
+            order.setTotal(total);
 
-        String companyName = request.getShippingCompanyName().trim().toLowerCase();
-        ShippingCompany shippingCompany = shippingCompanyRepository.findByUniqueName(companyName)
-                .orElseGet(() -> {
-                    ShippingCompany newCompany = new ShippingCompany();
-                    newCompany.setName(request.getShippingCompanyName().trim());
-                    return shippingCompanyRepository.save(newCompany);
+            String companyName = request.getShippingCompanyName().trim().toLowerCase();
+            ShippingCompany shippingCompany = shippingCompanyRepository.findByUniqueName(companyName)
+                    .orElseGet(() -> {
+                        ShippingCompany newCompany = new ShippingCompany();
+                        newCompany.setName(request.getShippingCompanyName().trim());
+                        return shippingCompanyRepository.save(newCompany);
+                    });
+
+            order.setShippingCompany(shippingCompany);
+            Order savedOrder = orderRepository.save(order);
+            pendingOrders.put(savedOrder.getId(), responseFuture);
+            
+            Order reloadedOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
+
+            OrderPlacedEvent event = getOrderPlaceEvent(reloadedOrder);
+            loggingService.logInfo("Sending an OrderPlacedEvent for order ID: " + reloadedOrder.getId());
+            rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, "order.placed", event, message ->{
+                    message.getMessageProperties().setReplyTo(RabbitMQConfig.ORDER_RESPONSES_QUEUE);
+                    message.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
+                    return message;
                 });
 
-        order.setShippingCompany(shippingCompany);
-        Order savedOrder = orderRepository.save(order);
-        pendingOrders.put(savedOrder.getId(), responseFuture);
-        
-        Order reloadedOrder = orderRepository.findById(savedOrder.getId()).orElseThrow();
+            scheduledExecutor.schedule(() -> {
+                if (!responseFuture.isDone()) {
+                    loggingService.logWarning("Order processing timeout for order ID: " + reloadedOrder.getId());
+                    OrderResponse timeoutResponse=convertToResponse(reloadedOrder);
+                    timeoutResponse.setStatus("FAILED");
+                    timeoutResponse.setMessage("Order processing timed out");
+                    timeoutResponse.setUnavailableItems(Collections.emptyList());
+                    timeoutResponse.setErrorCode("TIMEOUT");
+                    responseFuture.complete(timeoutResponse);
+                    pendingOrders.remove(savedOrder.getId());
 
-        OrderPlacedEvent event = getOrderPlaceEvent(reloadedOrder);
+                    reloadedOrder.setStatus(Order.OrderStatus.Failed);
+                    orderRepository.save(order);
+                }
+            }, 30, TimeUnit.SECONDS);
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, "order.placed", event, message ->{
-                message.getMessageProperties().setReplyTo(RabbitMQConfig.ORDER_RESPONSES_QUEUE);
-                message.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
-                return message;
-            });
-
-        scheduledExecutor.schedule(() -> {
-            if (!responseFuture.isDone()) {
-                OrderResponse timeoutResponse=convertToResponse(reloadedOrder);
-                timeoutResponse.setStatus("FAILED");
-                timeoutResponse.setMessage("Order processing timed out");
-                timeoutResponse.setUnavailableItems(Collections.emptyList());
-                timeoutResponse.setErrorCode("TIMEOUT");
-                responseFuture.complete(timeoutResponse);
-                pendingOrders.remove(savedOrder.getId());
-
-                reloadedOrder.setStatus(Order.OrderStatus.Failed);
-                orderRepository.save(order);
-            }
-        }, 30, TimeUnit.SECONDS);
-
-        return responseFuture;
+            return responseFuture;
+        }
+        catch(Exception e){
+            loggingService.logError("Error when processing order: " + e.getMessage());
+            throw e;
+        }
+    
     }
 
     OrderPlacedEvent getOrderPlaceEvent(Order o){
@@ -207,25 +220,27 @@ public class OrderService {
     @RabbitListener(queues = RabbitMQConfig.ORDER_RESPONSES_QUEUE)
     @Transactional
     public void handleOrderResponse(OrderProcessedResponse response) {
-
+        loggingService.logInfo("Received OrderProcessedResponse for order ID: " + response.getOrderId());
         CompletableFuture<OrderResponse> resFuture=pendingOrders.remove(response.getOrderId());
 
         if(resFuture!=null){
             Order order = orderRepository.findById(response.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Order not found: " + response.getOrderId()));
-
+            loggingService.logError("Order not found: " + response.getOrderId());
             OrderResponse orderResponse=new OrderResponse();
             orderResponse.setId(order.getId());
             orderResponse.setShippingCompany(order.getShippingCompany().getName());
             orderResponse.setTotal(order.getTotal());
 
             if(response.isSuccess()) {
+                loggingService.logInfo("Order successfully processed: " + order.getId());
                 order.setStatus(Order.OrderStatus.Completed);
                 orderResponse.setStatus("COMPLETED");
                 orderResponse.setMessage("Order is completed successfully! Items are reserved, proceed to checkout");
                 orderRepository.saveAndFlush(order);
             }
             else{
+                loggingService.logWarning("No pending response found for order ID: " + response.getOrderId());
                 order.setStatus(Order.OrderStatus.Failed);
                 System.out.println("Order failed: " + response.getMessage());
                 orderResponse.setStatus("PENDING");
@@ -242,11 +257,16 @@ public class OrderService {
 
 
     @Transactional
-    public OrderResponse checkoutOrder(Long orderId) {
+    public OrderResponse checkoutOrder(Long orderId){
+        loggingService.logInfo("Starting checkout for order ID: " + orderId);
         Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() ->{
+            loggingService.logError("Order not found during checkout: " + orderId); 
+            return new RuntimeException("Order not found");
+            });
         
         if (order.getStatus() != Order.OrderStatus.Completed) {
+            loggingService.logError("Invalid order state for checkout: " + order.getStatus());
             throw new IllegalStateException("Order is not in a checkout-able state");
         }
 
@@ -257,11 +277,13 @@ public class OrderService {
             response.setTotal(order.getTotal());
             
             if (order.getTotal() >= minCharge) {
+                loggingService.logInfo("Order checkout succeeded for ID: " + orderId);
                 order.setStatus(Order.OrderStatus.Confirmed);
                 response.setStatus("CONFIRMED");
                 response.setMessage("Order confirmed successfully");
             }
             else{
+                loggingService.logWarning("Order below minimum charge: " + order.getTotal() + " < " + minCharge);
                 orderRollbackEvent(order);
                 order.setStatus(Order.OrderStatus.Failed);
                 response.setStatus("FAILED");
@@ -279,6 +301,7 @@ public class OrderService {
             return response;
         }
         catch (Exception e) {
+            loggingService.logError("Checkout processing failed for order ID: "+orderId+" - " + e.getMessage());
             orderRollbackEvent(order);
             order.setStatus(Order.OrderStatus.Failed);
             orderRepository.save(order);
@@ -318,7 +341,7 @@ public class OrderService {
                     return itemEvent;
                 })
                 .toList());
-            
+            loggingService.logInfo("Order rollback successful for ID: " + order.getId());
             rabbitTemplate.convertAndSend(
                 RabbitMQConfig.ORDERS_EXCHANGE, 
                 "order.rollback", 
@@ -360,7 +383,7 @@ public class OrderService {
         event.setCustomerId(customerId);
         event.setTotalAmount(orderRepository.getById(orderId).getTotal());
         event.setFailureReason(reason);
-        event.setTimestamp(LocalDateTime.now());;
+        event.setTimestamp(LocalDateTime.now());
         rabbitTemplate.convertAndSend("PaymentFailed", "PaymentFailed", event);
     }
 

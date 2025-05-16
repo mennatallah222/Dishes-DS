@@ -8,9 +8,13 @@ com\dishes\dto\OrderFailedEvent.class
 com\dishes\services\OrderFailureServiceImpl.class
 com\dishes\services\OrderFailureService.class
 com\dishes\controllers\RestApplication.class
+com\dishes\entities\Log.class
+com\dishes\configs\LoggingRabbitMQConfig.class
 com\dishes\dto\SellerResponse.class
 com\dishes\rabbitmq\CredentialsConsumer.class
+com\dishes\services\LoggingService.class
 com\dishes\clients\CustomerServiceClient$1.class
+com\dishes\services\ErrorLogsConsumer.class
 com\dishes\rabbitmq\PaymentFailedConsumer.class
 com\dishes\dto\CredentialsMessage.class
 com\dishes\entities\OrderFailure.class

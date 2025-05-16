@@ -26,12 +26,14 @@ public class ProductService {
     private final SoldProductRepository soldProductRepository;
     private final SellerRespository sellerRespository;
     private final JwtTokenUtil token;
+    private final LoggingService loggingService;
 
-    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token, SoldProductRepository soldProductRepository) {
+    public ProductService(ProductRepository productRepository, SellerRespository sellerRespository, JwtTokenUtil token, SoldProductRepository soldProductRepository, LoggingService loggingService) {
         this.soldProductRepository=soldProductRepository;
         this.productRepository = productRepository;
         this.sellerRespository=sellerRespository;
         this.token=token;
+        this.loggingService=loggingService;
     }
 
     @Transactional
@@ -46,6 +48,7 @@ public class ProductService {
 
         boolean exists = productRepository.existsByNameAndSeller(dish.getName(), seller);
         if (exists) {
+            loggingService.logWarning("Dish already exists: " + dish.getName());
             return null;
         }
         Product newDish = new Product();
@@ -57,6 +60,7 @@ public class ProductService {
         newDish.setSeller(seller);
 
         Product savedDProduct=productRepository.save(newDish);
+        loggingService.logInfo("Successfully added dish: " + dish.getName()+" by seller id: "+sellerId);
         return mapToProductResponse(savedDProduct);
     }
 
@@ -83,15 +87,14 @@ public class ProductService {
             .orElse(null);
     
     if (existingDish == null) {
+        loggingService.logWarning("Attempting to update a non-existing dish: " + request.getName()+" by seller id: "+sellerId);
         return null;
     }        
     
-    boolean nameExists = productRepository.existsByNameAndSellerAndIdNot(
-            request.getName(), 
-            existingDish.getSeller(), 
-            dishId);
+    boolean nameExists = productRepository.existsByNameAndSellerAndIdNot(request.getName(), existingDish.getSeller(), dishId);
     
     if (nameExists) {
+        loggingService.logWarning("Attempting to update an already-existing dish: " + request.getName()+" by seller id: "+sellerId);
         return null;
     }
     
@@ -103,6 +106,8 @@ public class ProductService {
         request.getAmount() > 0 ? ProductStatus.AVAILABLE : ProductStatus.SOLD_OUT);
     
     Product updatedProduct = productRepository.save(existingDish);
+    loggingService.logInfo("Successfully updated dish: " + request.getName()+" by seller id: "+sellerId);
+
     return mapToProductResponse(updatedProduct);
 }
 

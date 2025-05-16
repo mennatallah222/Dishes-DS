@@ -4,6 +4,7 @@ com\dishes\repositories\CustomerRepository.class
 com\dishes\dtos\LoginDTO.class
 com\dishes\controllers\Response.class
 com\dishes\dtos\OrderResponse.class
+com\dishes\config\LoggingRabbitMQConfig.class
 com\dishes\services\AuthService.class
 com\dishes\config\RabbitMQConfig$1.class
 com\dishes\dtos\ErrorResponse.class
@@ -12,6 +13,7 @@ com\dishes\entities\Order$OrderStatus.class
 com\dishes\repositories\OrderRepository.class
 com\dishes\config\WebConfig.class
 com\dishes\Main.class
+com\dishes\services\LoggingService.class
 com\dishes\dtos\OrderProcessedResponse.class
 com\dishes\config\RabbitMQConfig.class
 com\dishes\entities\ShippingCompany.class

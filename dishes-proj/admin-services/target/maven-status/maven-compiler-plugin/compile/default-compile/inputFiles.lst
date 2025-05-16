@@ -1,6 +1,7 @@
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\entities\CompanyRep.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\jwt\JwtUtil.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\dto\CompanyCreationResult.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\entities\Log.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\dto\CredentialsMessage.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\startup\AdminInitializer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\configs\ObjectMapperProducer.java
@@ -20,9 +21,12 @@ C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\rabbitmq\PaymentFailedConsumer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\startup\ConsumerInitializer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\CustomerServiceBean.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\LoggingService.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\clients\CustomerServiceClient.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\controllers\ConfigsResource.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\controllers\RestApplication.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\entities\Admin.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\configs\LoggingRabbitMQConfig.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\dto\UserDTO.java
+C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\ErrorLogsConsumer.java
 C:\important files\4th year - 2nd term\distributed systems\assignments\a2\Dishes-DS\dishes-proj\admin-services\src\main\java\com\dishes\services\AdminServiceBean.java
